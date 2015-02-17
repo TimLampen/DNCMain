@@ -1,0 +1,474 @@
+#Default configuration file for DarkNessCraft Scoreboard
+#Author TimLampen
+ 
+#################################################################                                                              #                          #                         ScoreBoard Plugin                    #                                                                                                     #											    #
+################################################################
+ 
+CurrentVotes: 150
+ 
+MaxVotes: 150
+ 
+
+#Everything comes with a default value, so something does need to be put in. MAKE SURE that none of the Pos values are the same (you can use 0).
+
+#Words ending with "t" means title for that thing, for example Plyerst means the title of plyers, try to keep the "t" ending Pos value one bigger than the non-"t" value
+
+#The length of the string most not be more than 16 characters ( %whatever% counts as one) or it will throw errors.
+
+Scoreboard:
+#  Plyerst:
+#Dealing with the title of plyers
+#    Display: "&3&lOnline Peeps"
+#What it will look like
+#    Pos: 75
+#Position of the title (greater the number, the higher up)
+#This configuration would make this http://prntscr.com/541ozw
+  Title:
+    Display: 
+#Title of the scoreboard
+
+  Plyerst:
+#Plyers title
+    Display: 
+    Pos: 
+
+  Plyers:
+#Plyers value
+#%max% = max amount of players
+#%players% = players online
+    Display:
+    Pos:
+
+  Moneyt:
+#Money title
+    Display:
+    Pos:
+
+  Money:
+#Money value
+#%money% = player money
+    Display:
+    Pos:
+
+  Multit:
+#Multiplier title
+    Display:
+    Pos:
+
+  Multi:
+#Multiplier value
+#%multi% = player multiplier
+    Display:
+    Pos:
+
+  Crnkt:
+#Current rank title
+    Display:
+    Pos:
+
+  Crnk:
+#Current rank value
+#%rank% = player rank
+    Display:
+    Pos:
+
+  Nrnkt:
+#Next rank title
+    Display:
+    Pos:
+
+  Nrnk:
+#Next rank value
+#%number% = % till next rank
+    Display:
+    Pos:
+
+  Dpt:
+#Drop party title
+    Display:
+    Pos:
+
+  Dp:
+#Drop party value
+#%vote% = votes needed for drop party
+    Display:
+    Pos:
+
+#################################################################                                                              #                          #                         DropParty Plugin                     #                                                                                                     #											    #
+################################################################
+DropParty:
+  AmountOfItems: 1
+#The amount of items in the drop party
+ 
+  EndOfDPMsg: "&3End of the drop party!"
+#The message that will be broadcasted at the end of the dropparty
+ 
+  StartOfDPMsg: "&3The drop party has started!"
+ 
+  DelayBetweenItems: 5
+#The delay between the items being given (seconds)
+ 
+  AmountOfDifferentItems: 10
+#The amount of DIFFERENT items you have below (Item1, Item2)
+
+  Commands:
+    - "give %player% diamondblock 128"
+    - "give %player% emeraldblock 128"
+    - "give %player% ironblock 128"
+    - "eco give %player% 50000000"
+    - "eco give %player% 10000000"
+    - "give %player% lavabucket 1"
+    - "give %player% waterbucket 1"
+    - "give %player% dhelmet 1 name:&bDrop_&cParty_&aHat prot:4 unbreaking:1"
+    - "give %player% dchest 1 name:&bDrop_&cParty_&aShirt prot:4 unbreaking:1"
+    - "give %player% dleggings 1 name:&bDrop_&cParty_&aLegs prot:4 unbreaking:1"
+    - "give %player% dboots 1 name:&bDrop_&cParty_&aShoes prot:4 unbreaking:1"
+    - "give %player% dsword 1 name:&bDrop_&cParty_&aSword_&e;) sharp:5 knockback:5 unbreaking:5"
+    - "give %player% dpick 1 name:&bDrop_&cParty_&aPick digspeed:25 fortune:10 unbreaking:5"
+ 
+ 
+#################################################################                                                              #                          #                         NoDrop Plugin                        #                                                                                                     #											    #
+################################################################
+ 
+# Add what world(s) to disable the plugin in
+settings:
+    disabled-worlds:
+    - plotworld
+ 
+# Make any block drop what ever you would like (Must match Bukkit's Material Data)
+# rangeMin and rangeMax is not required
+# Control the minimum and maximum amount allowed to be dropped from that block
+blocks:
+    STONE:
+        drop: STONE
+        rangeMin: 5
+        rangeMax: 40
+    EMERALD_BLOCK:
+        drop: EMERALD_BLOCK
+        rangeMin: 5
+        rangeMax: 40
+    DIAMOND_BLOCK:
+        drop: DIAMOND_BLOCK
+        rangeMin: 5
+        rangeMax: 40
+    GOLD_BLOCK:
+        drop: GOLD_BLOCK
+        rangeMin: 5
+        rangeMax: 40
+    IRON_BLOCK:
+        drop: IRON_BLOCK
+        rangeMin: 5
+        rangeMax: 40
+    REDSTONE_BLOCK:
+        drop: REDSTONE_BLOCK
+        rangeMin: 5
+        rangeMax: 40
+    LAPIS_BLOCK:
+        drop: LAPIS_BLOCK
+        rangeMin: 5
+        rangeMax: 40
+    COAL_BLOCK:
+        drop: COAL_BLOCK
+        rangeMin: 5
+        rangeMax: 40
+    COAL_ORE:
+        drop: COAL
+        rangeMin: 5
+        rangeMax: 40
+    IRON_ORE:
+        drop: IRON_INGOT
+        rangeMin: 5
+        rangeMax: 40
+    GOLD_ORE:
+        drop: GOLD_INGOT
+        rangeMin: 5
+        rangeMax: 40
+    DIAMOND_ORE:
+        drop: DIAMOND
+        rangeMin: 5
+        rangeMax: 40
+    EMERALD_ORE:
+        drop: EMERALD
+        rangeMin: 5
+        rangeMax: 40
+    REDSTONE_ORE:
+        drop: REDSTONE
+        rangeMin: 5
+        rangeMax: 40
+    GLOWING_REDSTONE_ORE:
+        drop: REDSTONE
+        rangeMin: 5
+        rangeMax: 40
+    QUARTZ_ORE:
+        drop: QUARTZ
+        rangeMin: 5
+        rangeMax: 40
+    QUARTZ_BLOCK:
+        drop: QUARTZ_BLOCK
+        rangeMin: 5
+        rangeMax: 40
+    OBSIDIAN:
+        drop: OBSIDIAN
+        rangeMin: 5
+        rangeMax: 40
+ 
+# Must not skip a level, ability to go up to any Fortune Level
+# Format: FORTUNE_LEVEL: MULTIPLER
+fortuneLevels:
+  lvl15: 2
+  lvl18: 2
+  lvl20: 2
+  lvl25: 2
+  lvl28: 3
+  lvl30: 4
+  lvl40: 5
+  lvl50: 6
+  lvl80: 7
+ 
+#################################################################                                                              #                          #                         Rankup Plugin                        #                                                                                                     #											    #
+################################################################
+ 
+Rankup-Message: '&c[PlayerName] &7has ranked up to &c[Group]&7!'
+Must-Be-Player: '&7This command must be ran by a player!'
+Not-Enough-Money: |-
+  &7You do not have enough money to rankup.
+  You need &c&l$[Remainder]&7 more to rankup!
+Invaid-Group: |-
+  &7You are not in a group that can rank up.
+  If you think this is a mistake please contact a server admin.
+MineRegions:
+  - amine
+  - bmine
+  - cmine
+  - dmine
+rankup:
+  A:
+    cost: 50000
+    nextrank: B
+  B:
+    cost: 500000
+    nextrank: C
+  C:
+    cost: 2000000
+    nextrank: D
+  D:
+    cost: 20000000
+    nextrank: E
+  E:
+    cost: 50000000
+    nextrank: F
+  F:
+    cost: 100000000
+    nextrank: G
+  G:
+    cost: 150000000
+    nextrank: H
+  H:
+    cost: 200000000
+    nextrank: I
+  I:
+    cost: 400000000
+    nextrank: J
+  J:
+    cost: 600000000
+    nextrank: K
+  K:
+    cost: 900000000
+    nextrank: L
+  L:
+    cost: 1200000000
+    nextrank: M
+  M:
+    cost: 1500000000
+    nextrank: N
+  N:
+    cost: 2000000000
+    nextrank: O
+  O:
+    cost: 3000000000
+    nextrank: P
+  P:
+    cost: 4000000000
+    nextrank: Q
+  Q:
+    cost: 7000000000
+    nextrank: R
+  R:
+    cost: 10000000000
+    nextrank: S
+  S:
+    cost: 20000000000
+    nextrank: T
+  T:
+    cost: 30000000000
+    nextrank: U
+  U:
+    cost: 65000000000
+    nextrank: V
+  V:
+    cost: 90000000000
+    nextrank: W
+  W:
+    cost: 160000000000
+    nextrank: X
+  X:
+    cost: 225000000000
+    nextrank: Y
+  Y:
+    cost: 250000000000
+    nextrank: Z
+  Z:
+    cost: 337500000000
+    nextrank: Warlock
+  Warlock:
+    cost: 675000000000
+    nextrank: Guardian
+  Guardian:
+    cost: 900000000000
+    nextrank: Phantom
+  Phantom:
+    cost: 1350000000000
+    nextrank: Emperor
+  Emperor:
+    cost: 1800000000000
+    nextrank: Spartan
+  Spartan:
+    cost: 2470000000000
+    nextrank: Siren
+  Siren:
+    cost: 3150000000000
+    nextrank: Argos
+  Argos:
+    cost: 4300000000000
+    nextrank: Saytre
+  Saytre:
+    cost: 5000000000000
+    nextrank: Kronos
+  Kronos:
+    cost: 5700000000000
+    nextrank: Hades
+  Hades:
+    cost: 0
+
+#################################################################                                                              #                          #                        Explosives Plugin                     #                                                                                                     #											    #
+################################################################
+ 
+GrenadeCooldown: 5
+#The amount of time the player has to wait to throw another grenade
+ 
+RocketCooldown: 10
+#same as grenade
+
+EnragedAmount: 500
+#Amount of blocks player has to mine to be enraged
+
+KittyChance: 150
+#the chance that a cat will appear ex. (if it was 100) then there would be a 1 in 100 chance
+#################################################################                                                              #                          #                         Goodie Plugin                        #                                                                                                     #											    #
+################################################################
+AmountOfDifferentGoodies: 1
+#Amount of goodies you have below(Goodie1, Goodie2 etc)
+
+AmountOfGoodieItems: 5
+#Amount to give to the player when he clicks the bag
+
+Goodie:
+  Commands:
+    - "give %player% diamondblock 128"
+    - "give %player% emeraldblock 128"
+    - "give %player% ironblock 128"
+    - "eco give %player% 50000000"
+    - "eco give %player% 10000000"
+    - "give %player% lavabucket 1"
+    - "give %player% waterbucket 1"
+    - "give %player% dhelmet 1 name:&bDrop_&cParty_&aHat prot:4 unbreaking:1"
+    - "give %player% dchest 1 name:&bDrop_&cParty_&aShirt prot:4 unbreaking:1"
+    - "give %player% dleggings 1 name:&bDrop_&cParty_&aLegs prot:4 unbreaking:1"
+    - "give %player% dboots 1 name:&bDrop_&cParty_&aShoes prot:4 unbreaking:1"
+    - "give %player% dsword 1 name:&bDrop_&cParty_&aSword_&e;) sharp:5 knockback:5 unbreaking:5"
+    - "give %player% dpick 1 name:&bDrop_&cParty_&aPick digspeed:25 fortune:10 unbreaking:5"
+
+#################################################################                                                              #                          #                         Scratch Cards                        #                                                                                                     #											    #
+################################################################ 
+Cards:
+#Name of the person who "signed" the card
+#All names comes with defaults (dont have to fill these in)
+  Name1:
+#30% chance
+  Name2:
+#10% chance
+  Name3:
+#10% chance
+  Name4:
+#10% chance
+  Name5:
+#10% chance
+  Name6:
+#10% chance
+  Name7:
+#10% chance
+  Name8:
+#5% chance
+  Name9:
+#3% chance (plez no change) - Tim
+  Name10:
+#2% chance
+
+#################################################################                                                              #                          #                         ColorPick Plugin                     #                                                                                                     #											    #
+################################################################ 
+ColorPick:
+#dont edit unless you know what you are doing
+  Suffix:
+  Prefix:
+#################################################################                                                              #                          #                         Tokens Plugin                        #                                                                                                     #											    #
+################################################################ 
+tokens:
+ 
+#################################################################                                                              #                          #                         Messages                             #                                                                                                     #											    #
+################################################################
+ 
+#All messages come with defaults, so you dont need to input a value
+ 
+Messages:
+  SyntaxError:
+#Thrown when the player does not to a correct command.
+ 
+  PermissionError:
+#Thrown when the player does not have correct permission.
+ 
+  NullNumber:
+#Thrown when player inputs a character where there is suppose to be a number. Can input %number% in the message to act as the character that the player inputted.
+ 
+  NullPlayer:
+#Thrown when the user the player requested is not online. Can input %name% in the message to act as the name that the player inputted.
+ 
+ 
+  DPRestart:
+#Message sent to player when the drop party counter is reset
+ 
+  DPStart:
+#Message sent to player when the drop party starts by command
+ 
+  DPSet:
+#Message sent to player when he sets the drop party counter. Can use %number% as the number that the player used
+ 
+  MultiGetSet:
+#Message sent to the TARGET player who GETS their multipler set to a number. Can use %player% as the name who set the multipler, and %number% as the multipler number that it was set to.
+ 
+  MultiSet:
+#Message sent to the ORIGINAL player who SETS another persons to a number. Can use %player% as the TARGET name, and %number% as the multipler number that it was set to.
+ 
+  GrenadeGet:
+#Message sent to the TARGET player who GETS a number of grenades. Can use %player% as the name who gave them grenades, and %number% as the amount of grenades the player was given.
+ 
+  GrenadeGive:
+#Message sent to the ORIGNAL player who GIVES a number of grenades. Can use %player% as the name who grenades were given to, and %number% as the amount of grenades the player was given.
+ 
+  RocketGet:
+#Message sent to the TARGET player who GETS a number of rockets. Can use %player% as the name who gave them rockets, and %number% as the amount of rockets the player was given.
+ 
+  RocketGive:
+#Message sent to the ORIGNAL player who GIVES a number of rockets. Can use %player% as the name who rockets were given to, and %number% as the amount of rockets the player was given.
+
+  InvFull:
+#Message sent to the palyer when their entire inventory is full

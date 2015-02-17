@@ -1,0 +1,40 @@
+main: me.timlampen.util.Main
+name: DNCMain
+version: 1.1
+author: TimLampen
+depend: [Vault, Votifier, WorldGuard, EffectLib]
+commands:
+  dc:
+    description: Base command for ALL DNC commands
+  darknesscraft:
+    description: Base command for ALL DNC commands
+  rankup:
+    description: Ranks the user of this command up if possible
+  casino:
+    description: Opens the casino menus
+  crystals:
+    description: Commands dealing with crystals, the currency
+  crystal:
+    description: Commands dealing with crystals, the currency
+  warps:
+    description: Shows the list of all warps
+  ranks:
+    descrpition: Shows a list of all ranks
+  backpack:
+    descrpition: Opens a player specific backpack (same as bag)
+  bag:
+    descrpition: Opens a player specific bag (same as backpack)
+  sall:
+    descrpition: Sells all your items!
+  sellall:
+    description: Sells all your items!
+  crystalinv:
+    description: Opens an inventory to use crystals
+  prestige:
+    description: Prestiges yourself if you are the Hades rank
+  withdraw:
+    description: Withdraws an amount of money to a bank card
+  scoreboard:
+    description: Toggles Scoreboard
+
+description: This plugin is the main plugin for the DarkNessCaft Network (DNC). Any use of this plugin other than by DNC is prohibited, and should be reported to lampentimothy42@gmail.com.
