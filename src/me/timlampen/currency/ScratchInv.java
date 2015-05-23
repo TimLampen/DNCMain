@@ -39,7 +39,7 @@ public class ScratchInv implements Listener{
 	public void onClick(InventoryClickEvent event){
 		if(event.getWhoClicked() instanceof Player){
 			Player player = (Player)event.getWhoClicked();
-			if(event.getClickedInventory()!=null && event.getClickedInventory().getName()!=null && event.getClickedInventory().getName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "DNC Casino ($$$)")){
+			if(event.getInventory()!=null && event.getInventory().getName()!=null && event.getInventory().getName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "DNC Casino ($$$)")){
 				event.setCancelled(true);
 				player.closeInventory();
 				if(CooldownAPI.tryCooldown(player, "scratch", 10*1000)){

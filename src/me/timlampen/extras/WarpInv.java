@@ -75,6 +75,7 @@ public class WarpInv implements Listener{
 		ItemMeta im = is.getItemMeta();
 		im.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "↓ Donor Mines ↓");
 		is.setItemMeta(im);
+		
 		return is;
 	}
 	public ItemStack getDonorItem(Player player, String s){

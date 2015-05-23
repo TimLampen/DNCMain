@@ -106,35 +106,37 @@ public class Prestige {
 	
 	public String getNumber(int num){
 		if(num==1){
-			return "I";
+			return "I ";
 		}
 		else if(num==2){
-			return "II";
+			return "II ";
 		}
 		else if(num==3){
-			return "III";
+			return "III ";
 		}
 		else if(num==4){
-			return "IV";
+			return "IV ";
 		}
 		else if(num==5){
-			return "V";
+			return "V ";
 		}
 		else if(num==6){
-			return "VI";
+			return "VI ";
 		}
 		else if(num==7){
-			return "VII";
+			return "VII ";
 		}
 		else if(num==8){
-			return "VIII";
+			return "VIII ";
 		}
 		else if(num==9){
-			return "IX";
+			return "IX ";
 		}
 		else if(num==10){
-			return "X";
+			return "X ";
 		}
-		return "";
+		else{
+			return "0 ";
+		}
 	}
 }

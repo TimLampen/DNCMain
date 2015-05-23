@@ -28,7 +28,7 @@ public class RankDis{
 				player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ">>>YOU ARE HERE<<<");
 			}
 			else{
-				player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD +  + i + ChatColor.RED + " " + s + ChatColor.GREEN + " Cost: " + ChatColor.DARK_GRAY + r.getNextRankCost(s, player));
+				player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD +  + i + ChatColor.WHITE + " " + s + ChatColor.GREEN + " Cost: " + ChatColor.GRAY + p.getMoney(r.getNextRankCost(s, player)));
 			}
 		}
 	}

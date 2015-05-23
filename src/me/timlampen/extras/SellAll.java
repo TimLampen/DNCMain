@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import me.timlampen.dcscoreboard.BlockListener;
 import me.timlampen.util.ConfigMaker;
 import me.timlampen.util.Main;
 import me.timlampen.util.Parse;
@@ -17,10 +18,12 @@ import org.bukkit.inventory.ItemStack;
 public class SellAll{
 	Main p;
 	Parse pa;
+	BlockListener bl;
 	private ConfigMaker config;
-	public SellAll(Main p, Parse pa){
+	public SellAll(Main p, Parse pa, BlockListener bl){
 		this.p = p;
 		this.pa = pa;
+		this.bl =  bl;
 		config = new ConfigMaker(p, "shop");
 		config.save();
 	}
@@ -48,6 +51,22 @@ public class SellAll{
 		}
 		mat.clear();
 		player.sendMessage(p.getPrefix() + ChatColor.GREEN + "You sold all your blocks for a total of" + ChatColor.AQUA + " $" + ChatColor.BOLD + getMoney(value) + "!");
+		for(double i = 1.0; i<=5.0; i=i+.1){
+			if(player.hasPermission("multiplier." + i)){
+				if(i<=bl.getMultiplier(player)){
+					break;
+				}
+				else{
+					p.eco.depositPlayer(player, value*i);
+					player.sendMessage(p.getPrefix() + ChatColor.YELLOW + "Multiplier Detected! You have sold your blocks for " + ChatColor.GOLD + "x" + i + ChatColor.YELLOW + " the money!");
+					break;
+				}
+			}
+		}
+		if(bl.getMultiplier(player)>1){
+			p.eco.depositPlayer(player, value*bl.getMultiplier(player));
+			player.sendMessage(p.getPrefix() + ChatColor.YELLOW + "Multiplier Detected! You have sold your blocks for " + ChatColor.GOLD + "x" + bl.getMultiplier(player) + ChatColor.YELLOW + " the money! A total of " + ChatColor.GOLD + "" + ChatColor.BOLD + "$" + getMoney(value*bl.getMultiplier(player)));
+		}
 	}
 	
 	public Double getItemPrice(String rank, Material type){

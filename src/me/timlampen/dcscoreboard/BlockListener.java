@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import me.timlampen.commands.CommandHandler;
+import me.timlampen.extras.SellAll;
 import me.timlampen.util.Main;
 
 import org.bukkit.Material;
@@ -21,17 +23,21 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class BlockListener implements Listener{
-  private Random rnd = new Random(System.currentTimeMillis());
+  private Random rnd = new Random();
 	Main p;
-	public BlockListener(Main p){
+	CommandHandler ch;
+	SellAll sa;
+	public BlockListener(Main p, CommandHandler ch, SellAll sa){
 		this.p = p;
+		this.ch = ch;
+		this.sa = sa;
 	}
-	HashMap<UUID, Integer> multi = new HashMap<UUID, Integer>();
+	HashMap<UUID, Double> multi = new HashMap<UUID, Double>();
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event){
 		Player player = event.getPlayer();
 		if(!multi.containsKey(player.getUniqueId())){
-			multi.put(player.getUniqueId(), 1);
+			multi.put(player.getUniqueId(), 1.0);
 		}
 	}
 	
@@ -45,27 +51,33 @@ public class BlockListener implements Listener{
       if (event.isCancelled()) {
         return;
       }
-      int multi = getFortuneMultipler(player.getItemInHand());
       
-      int min = p.getConfig().getInt("blocks." + block.getType().name() + ".rangeMin", 1) * multi;
-      int max = p.getConfig().getInt("blocks." + block.getType().name() + ".rangeMax", 1) * multi;
       
       String drop = p.getConfig().getString("blocks." + block.getType().name() + ".drop", block.getType().name());
       
-      int amount = min;
-      if (min < max) {
-        amount += this.rnd.nextInt(max - min);
-      }
       event.setCancelled(true);
       ((ExperienceOrb)player.getWorld().spawn(block.getLocation(), ExperienceOrb.class)).setExperience(event.getExpToDrop());
       player.getWorld().getBlockAt(block.getLocation()).setType(Material.AIR);
       
       ItemStack is = new ItemStack(Material.getMaterial(drop));
-      is.setAmount(amount*getMultiplier(player));
-      player.getInventory().addItem(new ItemStack[] { is });
-      
-      player.updateInventory();
-      
+      String s = getFortuneMultipler(player.getItemInHand());
+      String[] ssplit = s.split("-");
+      int min = Integer.parseInt(ssplit[0]);
+      int max = Integer.parseInt(ssplit[1]);
+      if(min>max || s.equals("1-1")){
+    	  is.setAmount(1);
+      }
+      else{
+    	  int ran = rnd.nextInt(max-min)+min;
+    	  is.setAmount(ran);
+      }
+      if(ch.asell.contains(player.getUniqueId())){
+			p.eco.depositPlayer(player, sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), is.getType())*is.getAmount());
+      }
+      else{
+    	  player.getInventory().addItem(new ItemStack[] { is });
+    	  player.updateInventory();
+      }
 
       ItemStack tool = player.getItemInHand();
       if (tool.containsEnchantment(Enchantment.DURABILITY))
@@ -97,7 +109,7 @@ public class BlockListener implements Listener{
     return Boolean.valueOf(false);
   }
   
-  private int getFortuneMultipler(ItemStack tool)
+  private String getFortuneMultipler(ItemStack tool)
   {
     if (isPickaxe(tool).booleanValue())
     {
@@ -106,12 +118,12 @@ public class BlockListener implements Listener{
       {
         int level = ((Integer)enchants.get(Enchantment.LOOT_BONUS_BLOCKS)).intValue();
         if (p.getConfig().get("fortuneLevels.lvl" + level) == null) {
-          return 1;
+          return "1-1";
         }
-        return p.getConfig().getInt("fortuneLevels.lvl" + level, 1);
+        return p.getConfig().getString("fortuneLevels.lvl" + level, "1-1");
       }
     }
-    return 1;
+    return "1-1";
   }
   
   private int getUnbreakingLevel(ItemStack tool)
@@ -157,7 +169,7 @@ public class BlockListener implements Listener{
     return false;
   }
   
-	public int getMultiplier(Player player){
+	public double getMultiplier(Player player){
 		if(multi.containsKey(player.getUniqueId())){
 			return multi.get(player.getUniqueId());
 		}
@@ -165,13 +177,13 @@ public class BlockListener implements Listener{
 			return 1;
 		}
 	}
-	public void setMultiplier(Player player, Integer value){
+	public void setMultiplier(Player player, double value){
 		if(multi.containsKey(player.getUniqueId())){
 			multi.remove(player.getUniqueId());
 			multi.put(player.getUniqueId(), value);
 		}
 		else{
-		multi.put(player.getUniqueId(), value);
+			multi.put(player.getUniqueId(), value);
 		}
 	}
   

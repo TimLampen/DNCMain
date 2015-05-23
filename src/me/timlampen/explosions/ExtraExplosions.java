@@ -30,7 +30,7 @@ public class ExtraExplosions implements Listener{
 	public void onBlock1(BlockBreakEvent event){
 		Player player = event.getPlayer();
 		if(event.getBlock().getType()==Material.TNT){
-			if(p.isInRegion(event.getBlock())){
+			if(p.isInAllowedRegion(event.getBlock())){
 				event.getBlock().setType(Material.AIR);
 				Entity tnt = player.getWorld().spawn(event.getBlock().getLocation(), TNTPrimed.class);
 				((TNTPrimed)tnt).setFuseTicks(4);
@@ -44,7 +44,7 @@ public class ExtraExplosions implements Listener{
 		Random ran = new Random();
 		int r = ran.nextInt(p.getConfig().getInt("KittyChance")+1);
 		if(r==1){
-			if(p.isInRegion(event.getBlock())){
+			if(p.isInAllowedRegion(event.getBlock())){
 				l.doMessage(player, l.s1.KITTY_UNEARTH, "", "");
 				final LivingEntity ocelot = player.getWorld().spawnCreature(event.getBlock().getLocation(), EntityType.OCELOT);
 				ocelot.setCustomName(ChatColor.RED + "Explosive Cat");

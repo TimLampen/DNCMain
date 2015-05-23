@@ -1,6 +1,19 @@
 #Default configuration file for DarkNessCraft Scoreboard
 #Author TimLampen
- 
+#################################################################                                                              #                          #                         Prefix Plugin                        #                                                                                                     #											    #
+################################################################
+
+prisonprefix:
+  Prisoner:
+    prefix: '&8┃ &7&oPrisoner &8┃&r'
+    weight: 4
+    permission: prisonprefix.prisoner
+  Owner:
+    prefix: '&8┃ &f&oOwner &8┃&r'
+    weight: 1
+    permission: prisonprefix.owner
+
+
 #################################################################                                                              #                          #                         ScoreBoard Plugin                    #                                                                                                     #											    #
 ################################################################
  
@@ -24,75 +37,64 @@ Scoreboard:
 #Position of the title (greater the number, the higher up)
 #This configuration would make this http://prntscr.com/541ozw
   Title:
-    Display: 
+    Display: '&6&lMC-DNC'
 #Title of the scoreboard
 
   Plyerst:
 #Plyers title
-    Display: 
-    Pos: 
+    Display: '&f&lOnline:'
+    Pos: 2
 
   Plyers:
 #Plyers value
 #%max% = max amount of players
 #%players% = players online
-    Display:
-    Pos:
+    Display: '&7%players%'
+    Pos: 1
 
   Moneyt:
 #Money title
-    Display:
-    Pos:
+    Display: '&f&lCost:'
+    Pos: 8
 
   Money:
 #Money value
 #%money% = player money
-    Display:
-    Pos:
-
-  Multit:
-#Multiplier title
-    Display:
-    Pos:
-
-  Multi:
-#Multiplier value
-#%multi% = player multiplier
-    Display:
-    Pos:
+    Display: '&7%money%'
+    Pos: 7
 
   Crnkt:
 #Current rank title
-    Display:
-    Pos:
+    Display: '&f&lRank:'
+    Pos: 14
 
   Crnk:
 #Current rank value
 #%rank% = player rank
-    Display:
-    Pos:
+    Display: '&7%rank%'
+    Pos: 13
 
   Nrnkt:
 #Next rank title
-    Display:
-    Pos:
+    Display: '&f&lRankup:'
+    Pos: 11
 
   Nrnk:
 #Next rank value
 #%number% = % till next rank
-    Display:
-    Pos:
+    Display: '&7%number%'
+    Pos: 10
 
   Dpt:
 #Drop party title
-    Display:
-    Pos:
+    Display: '&f&lVotes to VP:'
+    Pos: 1
 
   Dp:
 #Drop party value
 #%vote% = votes needed for drop party
-    Display:
-    Pos:
+    Display: '&7%vote%'
+    Pos: 0
 
 #################################################################                                                              #                          #                         DropParty Plugin                     #                                                                                                     #											    #
 ################################################################
@@ -135,95 +137,19 @@ settings:
     disabled-worlds:
     - plotworld
  
-# Make any block drop what ever you would like (Must match Bukkit's Material Data)
-# rangeMin and rangeMax is not required
-# Control the minimum and maximum amount allowed to be dropped from that block
-blocks:
-    STONE:
-        drop: STONE
-        rangeMin: 5
-        rangeMax: 40
-    EMERALD_BLOCK:
-        drop: EMERALD_BLOCK
-        rangeMin: 5
-        rangeMax: 40
-    DIAMOND_BLOCK:
-        drop: DIAMOND_BLOCK
-        rangeMin: 5
-        rangeMax: 40
-    GOLD_BLOCK:
-        drop: GOLD_BLOCK
-        rangeMin: 5
-        rangeMax: 40
-    IRON_BLOCK:
-        drop: IRON_BLOCK
-        rangeMin: 5
-        rangeMax: 40
-    REDSTONE_BLOCK:
-        drop: REDSTONE_BLOCK
-        rangeMin: 5
-        rangeMax: 40
-    LAPIS_BLOCK:
-        drop: LAPIS_BLOCK
-        rangeMin: 5
-        rangeMax: 40
-    COAL_BLOCK:
-        drop: COAL_BLOCK
-        rangeMin: 5
-        rangeMax: 40
-    COAL_ORE:
-        drop: COAL
-        rangeMin: 5
-        rangeMax: 40
-    IRON_ORE:
-        drop: IRON_INGOT
-        rangeMin: 5
-        rangeMax: 40
-    GOLD_ORE:
-        drop: GOLD_INGOT
-        rangeMin: 5
-        rangeMax: 40
-    DIAMOND_ORE:
-        drop: DIAMOND
-        rangeMin: 5
-        rangeMax: 40
-    EMERALD_ORE:
-        drop: EMERALD
-        rangeMin: 5
-        rangeMax: 40
-    REDSTONE_ORE:
-        drop: REDSTONE
-        rangeMin: 5
-        rangeMax: 40
-    GLOWING_REDSTONE_ORE:
-        drop: REDSTONE
-        rangeMin: 5
-        rangeMax: 40
-    QUARTZ_ORE:
-        drop: QUARTZ
-        rangeMin: 5
-        rangeMax: 40
-    QUARTZ_BLOCK:
-        drop: QUARTZ_BLOCK
-        rangeMin: 5
-        rangeMax: 40
-    OBSIDIAN:
-        drop: OBSIDIAN
-        rangeMin: 5
-        rangeMax: 40
- 
 # Must not skip a level, ability to go up to any Fortune Level
 # Format: FORTUNE_LEVEL: MULTIPLER
 fortuneLevels:
-  lvl15: 2
-  lvl18: 2
-  lvl20: 2
-  lvl25: 2
-  lvl28: 3
-  lvl30: 4
-  lvl40: 5
-  lvl50: 6
-  lvl80: 7
+  lvl15: 1-5
+  lvl18: 1-10
+  lvl20: 3-6
+  lvl25: 1-1
+  lvl28: 1-2
+  lvl30: 62-100
+  lvl40: 13-76
+  lvl50: 111-1111
+  lvl80: 1-1
+  lvl100: 10-20
  
 #################################################################                                                              #                          #                         Rankup Plugin                        #                                                                                                     #											    #
 ################################################################
@@ -243,112 +169,112 @@ MineRegions:
   - dmine
 rankup:
   A:
-    cost: 50000
+    cost: 10
     nextrank: B
   B:
     cost: 500000
     nextrank: C
   C:
-    cost: 2000000
+    cost: 875000
     nextrank: D
   D:
-    cost: 20000000
+    cost: 6500000
     nextrank: E
   E:
-    cost: 50000000
+    cost: 10000000
     nextrank: F
   F:
-    cost: 100000000
+    cost: 30000000
     nextrank: G
   G:
-    cost: 150000000
+    cost: 600000000
     nextrank: H
   H:
-    cost: 200000000
+    cost: 1150000000
     nextrank: I
   I:
-    cost: 400000000
+    cost: 1600000000
     nextrank: J
   J:
-    cost: 600000000
+    cost: 2750000000
     nextrank: K
   K:
-    cost: 900000000
+    cost: 4200000000
     nextrank: L
   L:
-    cost: 1200000000
+    cost: 5750000000
     nextrank: M
   M:
-    cost: 1500000000
+    cost: 7500000000
     nextrank: N
   N:
-    cost: 2000000000
+    cost: 10000000000
     nextrank: O
   O:
-    cost: 3000000000
+    cost: 14000000000
     nextrank: P
   P:
-    cost: 4000000000
+    cost: 17570000000
     nextrank: Q
   Q:
-    cost: 7000000000
+    cost: 20500000000
     nextrank: R
   R:
-    cost: 10000000000
+    cost: 35000000000
     nextrank: S
   S:
-    cost: 20000000000
+    cost: 7000000000
     nextrank: T
   T:
-    cost: 30000000000
+    cost: 10300000000
     nextrank: U
   U:
-    cost: 65000000000
+    cost: 17000000000
     nextrank: V
   V:
-    cost: 90000000000
+    cost: 24000000000
     nextrank: W
   W:
-    cost: 160000000000
+    cost: 35000000000
     nextrank: X
   X:
-    cost: 225000000000
+    cost: 50000000000
     nextrank: Y
   Y:
-    cost: 250000000000
+    cost: 65000000000
     nextrank: Z
   Z:
-    cost: 337500000000
+    cost: 80000000000
     nextrank: Warlock
   Warlock:
-    cost: 675000000000
+    cost: 150000000000
     nextrank: Guardian
   Guardian:
-    cost: 900000000000
+    cost: 275000000000
     nextrank: Phantom
   Phantom:
-    cost: 1350000000000
+    cost: 350000000000
     nextrank: Emperor
   Emperor:
-    cost: 1800000000000
+    cost: 425000000000
     nextrank: Spartan
   Spartan:
-    cost: 2470000000000
+    cost: 500000000000
     nextrank: Siren
   Siren:
-    cost: 3150000000000
+    cost: 575000000000
     nextrank: Argos
   Argos:
-    cost: 4300000000000
+    cost: 3150000000000
     nextrank: Saytre
   Saytre:
-    cost: 5000000000000
+    cost: 4300000000000
     nextrank: Kronos
   Kronos:
-    cost: 5700000000000
+    cost: 5000000000000
     nextrank: Hades
   Hades:
-    cost: 0
+    cost: 5700000000000
 
 #################################################################                                                              #                          #                        Explosives Plugin                     #                                                                                                     #											    #
 ################################################################

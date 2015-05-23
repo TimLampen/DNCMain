@@ -43,11 +43,11 @@ public class ScoreBoardListener implements Listener{
 			 return null;
 		 }
 		 int amtonline;
-		     if(Bukkit.getOnlinePlayers().length<=1){
+		     if(Bukkit.getOnlinePlayers().size()<=1){
 		    	 amtonline = 1;
 		     }
 		     else{
-		    	 amtonline = Bukkit.getOnlinePlayers().length;
+		    	 amtonline = Bukkit.getOnlinePlayers().size();
 		     }
 	     String onlinet = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Plyerst.Display", ChatColor.GRAY + "" + ChatColor.BOLD + "Online"));
 	     String online = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Plyers.Display", ChatColor.RED + "" + ChatColor.BOLD + "" + amtonline + "/" + Bukkit.getMaxPlayers()).replace("%max%", Bukkit.getMaxPlayers() + "").replace("%players%", amtonline + ""));
@@ -56,9 +56,9 @@ public class ScoreBoardListener implements Listener{
 	     String moneyt = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Moneyt.Display", ChatColor.GRAY + "" + ChatColor.BOLD + "Money"));
 	     String moneya = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Money.Display", ChatColor.RED + "" + ChatColor.BOLD + getMoney(player)).replace("%money%", getMoney(player)));;
 	     
-	     String multit = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Multit.Display", ChatColor.GRAY + "" + ChatColor.BOLD + "Multiplier"));
-	     String multi = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Multi.Display", ChatColor.RED + "" + ChatColor.BOLD + "x" + bl.getMultiplier(player) + "Block(s)").replace("%multi%", bl.getMultiplier(player) + ""));
-	     
+	    // String multit = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Multit.Display", ChatColor.GRAY + "" + ChatColor.BOLD + "Multiplier"));
+	     //String multi = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Multi.Display", ChatColor.RED + "" + ChatColor.BOLD + "x" + bl.getMultiplier(player) + "Block(s)").replace("%multi%", bl.getMultiplier(player) + ""));
+	    // 
 	     String rnkt = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Crnkt.Display", ChatColor.GRAY + "" + ChatColor.BOLD + "Current Rank"));
 	     String rnk = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Crnk.Display", ChatColor.RED + "" + ChatColor.BOLD + Main.perms.getPrimaryGroup(player).toUpperCase()).replace("%rank%", Main.perms.getPrimaryGroup(player).toUpperCase()));
 	     
@@ -73,14 +73,11 @@ public class ScoreBoardListener implements Listener{
 	    	// nextrnk = getPercent(Main.eco.getBalance(player), r.getNextRankCost(p.perms.getPrimaryGroup(player), player));
 	    	nextpercent = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Nrnk.Display", ChatColor.RED + "" + ChatColor.BOLD + getActualPercent(Main.eco.getBalance(player), r.getNextRankCost(p.perms.getPrimaryGroup(player), player))).replace("%number%", getActualPercent(Main.eco.getBalance(player), r.getNextRankCost(p.perms.getPrimaryGroup(player), player))));
 	     }
-	     
 	     String dropt = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Dpt.Display", ChatColor.GRAY + "" + ChatColor.BOLD + "Votes Needed"));
 	     String drop = ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Dp.Display", ChatColor.RED + "" + ChatColor.BOLD + Main.vote).replace("%vote%", Main.vote + ""));
 		     
-	     if(pb.getObjective("title")!=null){
-	    	 pb.resetScores(player);
-	     }
 		     Objective objective = pb.registerNewObjective("title", "dummy");
+		     
 		     objective.setDisplayName(ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("Scoreboard.Title.Display", ChatColor.RED + "" + ChatColor.BOLD + "DarkNess" + ChatColor.GRAY + "" + ChatColor.BOLD + "Craft")));
 		     Score onlinetitle = objective.getScore(onlinet);
 		       onlinetitle.setScore(p.getConfig().getInt("Scoreboard.Plyerst.Pos", 11));
@@ -92,10 +89,10 @@ public class ScoreBoardListener implements Listener{
 			 Score moneyamt = objective.getScore(moneya);
 			 	moneyamt.setScore(p.getConfig().getInt("Scoreboard.Money.Pos", 8));
 			 	
-			 Score multipliert = objective.getScore(multit);
-			 	multipliert.setScore(p.getConfig().getInt("Scoreboard.Multit.Pos", 7));
-			 Score multiplier = objective.getScore(multi);
-			 	multiplier.setScore(p.getConfig().getInt("Scoreboard.Multi.Pos", 6));
+			// Score multipliert = objective.getScore(multit);
+			 //	multipliert.setScore(p.getConfig().getInt("Scoreboard.Multit.Pos", 7));
+			// Score multiplier = objective.getScore(multi);
+			// 	multiplier.setScore(p.getConfig().getInt("Scoreboard.Multi.Pos", 6));
 
 			 Score rankt = objective.getScore(rnkt);
 				 	rankt.setScore(p.getConfig().getInt("Scoreboard.Crnkt.Pos", 5));
@@ -107,7 +104,7 @@ public class ScoreBoardListener implements Listener{
 			// Score nextrank = objective.getScore(nextrnk);
 			// 	nextrank.setScore(3);
 			 	if(nextpercent.equalsIgnoreCase(ChatColor.RED + "" + ChatColor.BOLD + "100%")){
-			 		nextpercent = getCustomColor() + "" + ChatColor.BOLD + "/RANKUP";
+			 		nextpercent = ChatColor.GREEN + "" + ChatColor.BOLD + "/RANKUP";
 			 	}
 			 Score nextper = objective.getScore(nextpercent);
 				 nextper.setScore(p.getConfig().getInt("Scoreboard.Nrnk.Pos", 2));
@@ -133,27 +130,27 @@ public class ScoreBoardListener implements Listener{
 		 Double quin = new Double("1000000000000000000");
 		 if(amt>=quin){
 			 amt = amt/quin;
-			 s = df.format(amt) + "qu";
+			 s = df.format(amt) + "QU";
 		 }
 		 else if(amt>=quad){
 			 amt = amt/quad;
-			 s = df.format(amt) + "q";
+			 s = df.format(amt) + "Q";
 		 }
 		 else if(amt>=tril){
 			 amt = amt/tril;
-			 s = df.format(amt) + "t";
+			 s = df.format(amt) + "T";
 		 }
 		 else if(amt>=bill){
 			 amt = amt/bill;
-			 s = df.format(amt) + "b";
+			 s = df.format(amt) + "B";
 		 }
 		 else if(amt>=mill){
 			 amt = amt/mill;
-			 s = df.format(amt) + "m";
+			 s = df.format(amt) + "M";
 		 }
 		 else if(amt>=thou){
 			 amt = amt/thou;
-			 s = df.format(amt) + "k";
+			 s = df.format(amt) + "K";
 		 }
 		 else{
 			 s = df.format(amt) + "";

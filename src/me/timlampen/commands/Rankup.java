@@ -45,7 +45,7 @@ public class Rankup {
 	  public void rankup(String rank){
 	    double cost = Main.getPlugin().getConfig().getDouble("rankup." + rank + ".cost");
 	    double balance = Math.round(Main.eco.getBalance(player));
-	    if (cost == 0.0D){
+	    if (cost == 0.0D && !rank.equalsIgnoreCase("a")){
 	      player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + Main.getPlugin().getConfig().getString("Invaid-Group")));
 	      return;
 	    }
@@ -63,7 +63,7 @@ public class Rankup {
 	      Main.eco.withdrawPlayer(player, cost);
 	      Main.perms.playerRemoveGroup(player, rank);
 	      Main.perms.playerAddGroup(player, nextrank);
-	      Bukkit.broadcastMessage(prefix + ChatColor.GREEN + player.getDisplayName() + " Has Ranked Up To " + nextrank);
+	      Bukkit.broadcastMessage(ChatColor.DARK_GRAY + "[" + ChatColor.LIGHT_PURPLE + "Ranks" + ChatColor.DARK_GRAY + "] " + ChatColor.YELLOW + player.getName() + ChatColor.GRAY + " is now " + ChatColor.GREEN + "" + ChatColor.BOLD + nextrank + ChatColor.GRAY + "");
 	      player.chat("/warp " + nextrank);
 	      doTitle(player, player, nextrank);
 	    }

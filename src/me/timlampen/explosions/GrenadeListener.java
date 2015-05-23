@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.FireworkEffect.Builder;
 import org.bukkit.block.Block;
@@ -26,6 +27,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import de.slikey.effectlib.effect.TraceEffect;
 import de.slikey.effectlib.util.ParticleEffect;
@@ -51,10 +53,9 @@ public class GrenadeListener implements Listener{
 		if(event.getAction()==Action.RIGHT_CLICK_AIR || event.getAction()==Action.RIGHT_CLICK_BLOCK){
 			if(event.getItem()!=null && event.getItem().hasItemMeta() && event.getItem().getItemMeta().hasDisplayName() && event.getItem().getItemMeta().getDisplayName().contains(ChatColor.BLUE + "" + ChatColor.BOLD + ">>>" + ChatColor.YELLOW + "" + ChatColor.BOLD + "MineGrenade" + ChatColor.BLUE + "" + ChatColor.BOLD + "<<<"+ ChatColor.RED + "" + ChatColor.BOLD + " Level: ")){
 				if(CooldownAPI.tryCooldown(player, "grenade", 1000*p.getConfig().getInt("GrenadeCooldown"))){
-					p.message.add(player.getUniqueId());
 					ItemStack item = event.getItem();
 					final Item grenade = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.FIREWORK_CHARGE));
-					grenade.getItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 2);
+					grenade.setMetadata("grenade", new FixedMetadataValue(p, "grenade"));
 					final int level = 4*getLevel(item, player);
 					if(item.getAmount()<=1){
 						player.getInventory().removeItem(player.getItemInHand());
@@ -74,18 +75,13 @@ public class GrenadeListener implements Listener{
 						@Override
 						public void run() {
 							//tee.cancel();
-							e.explode(grenade.getLocation(), grenade, level, false, true);
+							e.explode(new Location(grenade.getWorld(), grenade.getLocation().getX(), grenade.getLocation().getY()-1, grenade.getLocation().getZ()), grenade, level, false, true);
 							grenade.remove();
 							pickup.remove(grenade);
 						}}, 60);
 				}
 				else{
-					if(p.message.contains(player.getUniqueId())){
-						p.message.remove(player.getUniqueId());
-					}
-					else{
-						player.sendMessage(p.getPrefix() + ChatColor.RED + "Error: You have to wait " + Math.round(CooldownAPI.getCooldown(player, "grenade")/1000) + " more seconds to use another grenade!");
-					}
+					player.sendMessage(p.getPrefix() + ChatColor.RED + "Error: You have to wait " + Math.round(CooldownAPI.getCooldown(player, "grenade")/1000) + " more seconds to use another grenade!");
 				}
 			}
 		}
@@ -151,6 +147,7 @@ public class GrenadeListener implements Listener{
 		return l;
 	}
 	//public static final StateFlag TNT = new StateFlag("other-explosion", true);
+	private ArrayList<Block> tempblks = new ArrayList<>();
 	private HashMap<Item, String> boom = new HashMap<Item, String>();
 	    @EventHandler
 	    public void onExplode(EntityExplodeEvent event){
@@ -158,7 +155,7 @@ public class GrenadeListener implements Listener{
 	        Player player = null;
 	        if(event.getEntity() instanceof Item){
 	            Item item = (Item)event.getEntity();
-	            if(item.getItemStack().getEnchantmentLevel(Enchantment.SILK_TOUCH)!=0){
+	            if(item.hasMetadata("grenade")){
 	                if(boom.containsKey(item) && Bukkit.getServer().getPlayer(boom.get(item))!=null){
 	                    player = Bukkit.getServer().getPlayer(boom.get(item));
 	                }
@@ -169,22 +166,27 @@ public class GrenadeListener implements Listener{
 	                }
 	            while(blocks.hasNext()){
 	                Block block = blocks.next();
-	                if(p.isInRegion(block)==true){
-	                    Iterator<ItemStack> stack = block.getDrops().iterator();
-	                    while(stack.hasNext()){
-	                        ItemStack items = stack.next();
-	                        if(items != null && player!=null) {
-	                        	if(items.getItemMeta().equals(Material.BEDROCK)){
-	                        		stack.remove();
-	                        		item.remove();
-	                        		blocks.remove();
-	                        	}
-	                        	else{
-	                        		player.getInventory().addItem(items);
-	                        		stack.remove();
-	                        	}
-	                        }
-	                    }
+	                player.sendMessage("1");
+	                if(p.isInAllowedRegion(block)){
+	                	player.sendMessage("allowed");
+	                	if(!tempblks.contains(block)){
+		                	tempblks.add(block);
+		                    Iterator<ItemStack> stack = block.getDrops().iterator();
+		                    while(stack.hasNext()){
+		                        ItemStack items = stack.next();
+		                        if(items != null && player!=null) {
+		                        	if(items.getItemMeta().equals(Material.BEDROCK)){
+		                        		stack.remove();
+		                        		item.remove();
+		                        		blocks.remove();
+		                        	}
+		                        	else{
+		                        		player.getInventory().addItem(items);
+		                        		stack.remove();
+		                        	}
+		                        }
+		                    }
+		                }
 	                }
 	                else{
 	                    blocks.remove();
@@ -192,5 +194,13 @@ public class GrenadeListener implements Listener{
 	            }
 	        }
 	     }
+	        
+	        Bukkit.getScheduler().runTaskLater(p, new Runnable(){
+
+				@Override
+				public void run() {
+					tempblks.clear();
+					
+				}}, 40);
 	  }
 }

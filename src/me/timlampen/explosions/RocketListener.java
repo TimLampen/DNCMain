@@ -1,7 +1,9 @@
 package me.timlampen.explosions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.UUID;
 
 import me.timlampen.util.CooldownAPI;
 import me.timlampen.util.Explosions;
@@ -26,6 +28,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 public class RocketListener implements Listener{
 	
 	Main p;
@@ -46,12 +49,11 @@ public class RocketListener implements Listener{
 		if(event.getAction()==Action.RIGHT_CLICK_AIR || event.getAction()==Action.RIGHT_CLICK_BLOCK){
 			if(event.getItem()!=null && event.getItem().hasItemMeta() && event.getItem().getItemMeta().hasDisplayName() && event.getItem().getItemMeta().getDisplayName().contains(ChatColor.YELLOW+ "" + ChatColor.BOLD + ">>>" + ChatColor.BLUE + "" + ChatColor.BOLD + "MineRocket" + ChatColor.YELLOW + "" + ChatColor.BOLD + "<<<"+ ChatColor.RED + "" + ChatColor.BOLD + " Level: ")){
 				if(CooldownAPI.tryCooldown(player, "rocket", 1000*p.getConfig().getInt("RocketCooldown"))){
-					p.message.add(player.getUniqueId());
 					ItemStack item = event.getItem();
 					final Item grenade = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.FIREWORK));
-					boomz.put(grenade, player.getName());
+					boomz.put(grenade, player.getUniqueId());
 					final int level = 2*getLevel(item, player);
-					grenade.getItemStack().addUnsafeEnchantment(Enchantment.DURABILITY, 2);
+					grenade.setMetadata("rocket", new FixedMetadataValue(p, "rocket"));
 					grenade.setVelocity(player.getEyeLocation().getDirection().multiply(1.0));
 					if(item.getAmount()<=1){
 						player.getInventory().removeItem(player.getItemInHand());
@@ -62,12 +64,7 @@ public class RocketListener implements Listener{
 					runnable(player, grenade, level);
 				}
 				else{
-					if(p.message.contains(player.getUniqueId())){
-						p.message.remove(player.getUniqueId());
-					}
-					else{
-						player.sendMessage(p.getPrefix() + ChatColor.RED + "Error: You have to wait " + Math.round(CooldownAPI.getCooldown(player, "rocket")/1000) + " more seconds to use another rocket!");
-					}
+					player.sendMessage(p.getPrefix() + ChatColor.RED + "Error: You have to wait " + Math.round(CooldownAPI.getCooldown(player, "rocket")/1000) + " more seconds to use another rocket!");
 				}
 			}
 		}
@@ -143,39 +140,61 @@ public class RocketListener implements Listener{
 				}
 			}}, 5);
 	}
-	private HashMap<Item, String> boomz = new HashMap<Item, String>();
-	@EventHandler
-    public void onExplode(EntityExplodeEvent event){
-        Iterator<Block> blocks = event.blockList().iterator();
-        Player player = null;
-        if(event.getEntity() instanceof Item){
-            Item item = (Item)event.getEntity();
-            if(item.getItemStack().getEnchantmentLevel(Enchantment.DURABILITY)!=0){
-                if(boomz.containsKey(item) && Bukkit.getServer().getPlayer(boomz.get(item))!=null){
-                    player = Bukkit.getServer().getPlayer(boomz.get(item));
-                }
-                else{
-                    item.remove();
-                    event.setCancelled(true);
-                    player = null;
-                }
-            while(blocks.hasNext()){
-                Block block = blocks.next();
-                if(p.isInRegion(block)){
-                    Iterator<ItemStack> stack = block.getDrops().iterator();
-                    while(stack.hasNext()){
-                        ItemStack items = stack.next();
-                        if(items != null && player!=null) {
-                           player.getInventory().addItem(items);
-                           stack.remove();
-                        }
-                    }
-                }
-                else{
-                    blocks.remove();
-                }
-            }
-        }
-        }
-    }
+	private ArrayList<Block> tempblks = new ArrayList<>();
+	private HashMap<Item, UUID> boomz = new HashMap<Item, UUID>();
+	    @EventHandler
+	    public void onExplode(EntityExplodeEvent event){
+	        Iterator<Block> blocks = event.blockList().iterator();
+	        Player player = null;
+	        if(event.getEntity() instanceof Item){
+	            Item item = (Item)event.getEntity();
+	            if(item.hasMetadata("rocket")){
+	                if(boomz.containsKey(item) && Bukkit.getServer().getPlayer(boomz.get(item))!=null){
+	                    player = Bukkit.getServer().getPlayer(boomz.get(item));
+	                }
+	                else{
+	                    item.remove();
+	                    event.setCancelled(true);
+	                    player = null;
+	                }
+	            while(blocks.hasNext()){
+	                Block block = blocks.next();
+	                player.sendMessage("1");
+	                if(p.isInAllowedRegion(block)){
+	                	player.sendMessage("2 - after allowedregion");
+	                	if(!tempblks.contains(block)){
+	                		player.sendMessage("3");
+		                	tempblks.add(block);
+		                    Iterator<ItemStack> stack = block.getDrops().iterator();
+		                    while(stack.hasNext()){
+		                        ItemStack items = stack.next();
+		                        if(items != null && player!=null) {
+		                        	if(items.getItemMeta().equals(Material.BEDROCK)){
+		                        		stack.remove();
+		                        		item.remove();
+		                        		blocks.remove();
+		                        	}
+		                        	else{
+		                        		player.getInventory().addItem(items);
+		                        		stack.remove();
+		                        	}
+		                        }
+		                    }
+		                }
+	                }
+	                else{
+	                    blocks.remove();
+	                }
+	            }
+	        }
+	     }
+	        
+	        Bukkit.getScheduler().runTaskLater(p, new Runnable(){
+
+				@Override
+				public void run() {
+					tempblks.clear();
+					
+				}}, 40);
+	  }
 }

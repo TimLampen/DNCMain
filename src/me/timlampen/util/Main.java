@@ -1,9 +1,13 @@
 package me.timlampen.util;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -25,7 +29,6 @@ import me.timlampen.explosions.ExtraExplosions;
 import me.timlampen.explosions.GrenadeListener;
 import me.timlampen.explosions.MineBow;
 import me.timlampen.explosions.RocketListener;
-import me.timlampen.extras.ColorPick;
 import me.timlampen.extras.EnragedMining;
 import me.timlampen.extras.Goodies;
 import me.timlampen.extras.Hologram;
@@ -38,6 +41,8 @@ import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -59,7 +64,6 @@ public class Main extends JavaPlugin{
 	private RankDis rd;
 	private CommandHandler ch;
 	private WarpInv wi;
-	private ColorPick cp;
 	private ScratchInv si;
 	private ScratchCards sc;
 	private Parse pa;
@@ -122,16 +126,15 @@ public class Main extends JavaPlugin{
 		setupEconomy();
 		setupPermissions();
 		console.sendMessage(getPrefix() + "Success! Registering Events...");
+		RankupCommand rc = new RankupCommand(this);
 		e = new Explosions();
 		pre = new Prestige(this);
-		cp = new ColorPick(this);
 		enm = new EnragedMining(this);
-		bl = new BlockListener(this);
 		h = new Hologram(this);
-		sc = new ScratchCards(this);
 		l = new Lang(this);
 		pa = new Parse(l);
-		sa = new SellAll(this, pa);
+		sc = new ScratchCards(this, pa);
+		sa = new SellAll(this, pa, bl);
 		r = new Rankup(l);
 		si = new ScratchInv(sc, this, l);
 		ee = new ExtraExplosions(this, l);
@@ -142,19 +145,18 @@ public class Main extends JavaPlugin{
 		dp = new DropParty(this, gl, rl);
 		vl = new SBVoteListener(this, dp);
 		t = new Tokens(this, l, pa);
-		ni = new NameInfo(this, t, pre);
+		ni = new NameInfo(this, t, pre, r);
 		bp = new BackPack(this, t, l);
 		wi = new WarpInv(this, l, r);
 		g = new Goodies(this, l, gl, rl);
 		sbl = new ScoreBoardListener(this, bl, r);
 		ui = new UpgradeInv(this,  t);
 		ch = new CommandHandler(gl, dp, bl, rl, this, l, sbl, mb, g, t, sc, rd, bp, sa, ui, pre);
+		bl = new BlockListener(this, ch, sa);
 		Bukkit.getPluginManager().registerEvents(bl, this);
 		Bukkit.getPluginManager().registerEvents(sbl, this);
-		Bukkit.getPluginManager().registerEvents(gl, this);
 		Bukkit.getPluginManager().registerEvents(rl, this);
 		Bukkit.getPluginManager().registerEvents(gl, this);
-		Bukkit.getPluginManager().registerEvents(rl, this);
 		Bukkit.getPluginManager().registerEvents(g, this);
 		Bukkit.getPluginManager().registerEvents(h, this);
 		Bukkit.getPluginManager().registerEvents(ee, this);
@@ -163,7 +165,6 @@ public class Main extends JavaPlugin{
 		Bukkit.getPluginManager().registerEvents(enm, this);
 		Bukkit.getPluginManager().registerEvents(sc, this);
 		Bukkit.getPluginManager().registerEvents(si, this);
-		Bukkit.getPluginManager().registerEvents(cp, this);
 		Bukkit.getPluginManager().registerEvents(wi, this);
 		Bukkit.getPluginManager().registerEvents(bp, this);
 		Bukkit.getPluginManager().registerEvents(ui, this);
@@ -181,15 +182,22 @@ public class Main extends JavaPlugin{
 		getCommand("crystals").setExecutor(ch);
 		getCommand("crystal").setExecutor(ch);
 		getCommand("ranks").setExecutor(ch);
-		getCommand("rankup").setExecutor(new RankupCommand(this));
+		getCommand("rankup").setExecutor(rc);
+		getCommand("nextrank").setExecutor(rc);
 		getCommand("withdraw").setExecutor(ch);
 		getCommand("scoreboard").setExecutor(ch);
+		getCommand("autosell").setExecutor(ch);
 		console.sendMessage(getPrefix() + "Success! Implementing Scoreboard...");
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
 			@Override
 			public void run() {
 				for(Player player : Bukkit.getOnlinePlayers()){
-					player.setScoreboard(sbl.setupScoreboard(player));
+					if(player.getScoreboard()==null){
+						player.setScoreboard(sbl.setupScoreboard(player));
+					}
+					else{
+						player.setScoreboard(sbl.setupScoreboard(player));
+					}
 					ui.checkEffects(player);
 				}
 				
@@ -210,6 +218,7 @@ public class Main extends JavaPlugin{
 		bp.loadItems();
 		ni.loadItems();
 		pre.loadPresitge();
+		addPermissions();
 		console.sendMessage(getPrefix() + "Success! Plugin Startup Complete!");
 	}
 	
@@ -296,33 +305,72 @@ public class Main extends JavaPlugin{
 		regions.clear();
 		return false;
 	}
-	public boolean isInRegion(Block e){
+	public boolean isInAllowedRegion(Block e){
 		RegionManager rm = getWorldGuard().getRegionManager(e.getWorld());
-		ApplicableRegionSet set = rm.getApplicableRegions(e.getLocation());
-		LinkedList< String > parentNames = new LinkedList< String >();
+		ApplicableRegionSet set = rm.getApplicableRegions(new Location(e.getLocation().getWorld(), e.getLocation().getX(), e.getLocation().getY()-1, e.getLocation().getZ()));
 		LinkedList< String > regions = new LinkedList< String >();
 		for(ProtectedRegion region : set){
 			String id = region.getId();
 			regions.add(id);
-			ProtectedRegion parent = region.getParent();
-			while(parent !=null){
-				parentNames.add(parent.getId());
-				parent = parent.getParent();
-			}
 		}
-		for(String name: parentNames){
-			regions.remove(name);
-		}
-		if(regions.size()<1){
-			return false;
-		} 
 		for(String s: getConfig().getStringList("MineRegions")){
 			if(regions.contains(s)){
 				return true;
 			}
 		}
-		parentNames.clear();
 		regions.clear();
 		return false;
 	}
+	 public String getMoney(double amt){
+		 DecimalFormat df = new DecimalFormat("#.###");
+		 String s = "";
+		 Double thou = new Double("1000");
+		 Double mill = new Double("1000000");
+		 Double bill = new Double("1000000000");
+		 Double tril = new Double("1000000000000");
+		 Double quad = new Double("1000000000000000");
+		 Double quin = new Double("1000000000000000000");
+		 if(amt>=quin){
+			 amt = amt/quin;
+			 s = df.format(amt) + "QU";
+		 }
+		 else if(amt>=quad){
+			 amt = amt/quad;
+			 s = df.format(amt) + "Q";
+		 }
+		 else if(amt>=tril){
+			 amt = amt/tril;
+			 s = df.format(amt) + "T";
+		 }
+		 else if(amt>=bill){
+			 amt = amt/bill;
+			 s = df.format(amt) + "B";
+		 }
+		 else if(amt>=mill){
+			 amt = amt/mill;
+			 s = df.format(amt) + "M";
+		 }
+		 else if(amt>=thou){
+			 amt = amt/thou;
+			 s = df.format(amt) + "K";
+		 }
+		 else{
+			 s = df.format(amt) + "";
+		 }
+		 return s;
+	 }
+	  public static List<String> permissions = new ArrayList<String>();
+	  public void addPermissions(){
+		  for(String key : getConfig().getConfigurationSection("prisonprefix").getKeys(false)){
+			  String prefix = getConfig().getString("prisonprefix." + key + ".prefix");
+			  String perm = getConfig().getString("prisonprefix." + key + ".permission");
+			  int weight = getConfig().getInt("prisonprefix." + key + ".weight");
+			  permissions.add(key + ":" + perm + ":" + weight + ":" + prefix);
+		  }
+	  }
+	  
+	  public static List<String> getPermissions()
+	  {
+	    return permissions;
+	  }
 }

@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import me.timlampen.util.Main;
+import me.timlampen.util.Parse;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,13 +24,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class ScratchCards implements Listener{
 	Main p;
-	public ScratchCards(Main p){
+	Parse pa;
+	public ScratchCards(Main p, Parse pa){
 		this.p = p;
+		this.pa = pa;
 	}
 	
 	@EventHandler
 	public void onCombine(InventoryClickEvent event){
-		if(event.getWhoClicked() instanceof Player && event.getCursor()!=null && event.getCursor().getType()!=null && event.getCurrentItem()!=null && event.getCurrentItem().getType()!=null && event.getCursor().getType()==Material.PAPER && event.getCurrentItem().getType()==Material.PAPER && event.getCursor().getItemMeta().hasLore() && event.getCurrentItem().getItemMeta().hasLore() && event.getClickedInventory()!=null && event.getClickedInventory().getType()==InventoryType.PLAYER){
+		if(event.getWhoClicked() instanceof Player && event.getCursor()!=null && event.getCursor().getType()!=null && event.getCurrentItem()!=null && event.getCurrentItem().getType()!=null && event.getCursor().getType()==Material.PAPER && event.getCurrentItem().getType()==Material.PAPER && event.getCursor().getItemMeta().hasLore() && event.getCurrentItem().getItemMeta().hasLore() && event.getInventory()!=null && event.getInventory().getType()==InventoryType.PLAYER){
 			Player player = (Player)event.getWhoClicked();
 			ItemStack cursor = event.getCursor();
 			ItemStack is = event.getCurrentItem();
@@ -49,7 +52,7 @@ public class ScratchCards implements Listener{
 				ItemStack item = event.getItem();
 				if(item.getItemMeta().hasLore() && parseDouble(player, item)!=0.0D){
 					p.eco.depositPlayer(player.getName(), parseDouble(player, item));
-					player.sendMessage(p.getPrefix() + ChatColor.GREEN + "You have just deposited " + parseDouble(player, item) + " into your bank account!");
+					player.sendMessage(p.getPrefix() + ChatColor.GREEN + "You have just deposited " + pa.getMoney(parseDouble(player, item)) + " into your bank account!");
 					player.getInventory().removeItem(item);
 				}
 			}
@@ -187,7 +190,7 @@ public class ScratchCards implements Listener{
 						player.sendMessage(p.getPrefix() + ChatColor.RED + "" + ChatColor.BOLD + "LOSS $" + (value-doub.get(player.getUniqueId())));
 					}
 					else{
-						Bukkit.broadcastMessage(p.getPrefix() + ChatColor.GREEN + player.getUniqueId() + " has won a $" + (doub.get(player.getUniqueId())-value) + " payout from a /casino Scratch-Off card!");
+						Bukkit.broadcastMessage(p.getPrefix() + ChatColor.GREEN + player.getName() + " has won a $" + pa.getMoney((doub.get(player.getUniqueId())-value)) + " payout from a /casino Scratch-Off card!");
 					}
 					player.getInventory().addItem(getCard(doub.get(player.getUniqueId())));
 					doub.remove(player.getUniqueId());

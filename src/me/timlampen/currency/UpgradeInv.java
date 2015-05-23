@@ -74,6 +74,19 @@ public class UpgradeInv implements Listener{
 			else if(event.getCurrentItem().getType()==Material.ENCHANTMENT_TABLE && is.getItemMeta().hasLore()){
 				openUpgradeInv(player);
 			}
+			else if(event.getCurrentItem().getType()==Material.ANVIL && is.getItemMeta().hasLore()){
+				if(player.getItemInHand()!=null){
+					ItemStack hand = player.getItemInHand();
+					if(t.hasTokens(player, 8)){
+						t.removeTokens(player, 8);
+						hand.setDurability((short) (hand.getDurability()-hand.getDurability()));
+					}
+					else{
+						player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
+						player.closeInventory();
+					}
+				}
+			}
 		}
 	}
 	
@@ -86,205 +99,205 @@ public class UpgradeInv implements Listener{
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onUpgradeClick(InventoryClickEvent event){
-		if(event.getWhoClicked() instanceof Player && event.getInventory()!=null && event.getInventory().getName()!=null && event.getClickedInventory()!=null && event.getInventory().getName().equalsIgnoreCase("upgrade inventory")){
+		if(event.getWhoClicked() instanceof Player && event.getInventory()!=null && event.getInventory().getName()!=null && event.getInventory()!=null && event.getInventory().getName().equalsIgnoreCase("upgrade inventory")){
 			Player player = (Player)event.getWhoClicked();
-			if(!(event.getClickedInventory().getType() == InventoryType.PLAYER)){
+			if(event.getCurrentItem()!=null && !(event.getClickedInventory().getType()==InventoryType.PLAYER)){
 				event.setCancelled(true);
-			}
-			//back button
-			ItemStack is = event.getCurrentItem();
-			if(is.getType()==Material.COMPASS && is.getItemMeta().hasLore()){
-				player.closeInventory();
-			}
-			//player puts item in the slot
-			else if(is.getType()==Material.EMERALD && is.getItemMeta().hasLore() && event.getCursor()!=null){
-				is = event.getCursor();
-				if(!is.getType().toString().contains("PICKAXE")){
-					player.sendMessage(p.getPrefix() + ChatColor.RED + "The item has to be a pickaxe!");
+				//back button
+				ItemStack is = event.getCurrentItem();
+				if(is.getType()==Material.COMPASS && is.getItemMeta().hasLore()){
+					player.closeInventory();
 				}
-				else{
-					event.getInventory().setItem(13, is);
-					event.setCursor(new ItemStack(Material.AIR));
-					cursor.put(player.getName(), is);
-					event.getInventory().setItem(1, getUpgrade(1));
-					event.getInventory().setItem(3, getUpgrade(2));
-					event.getInventory().setItem(5, getUpgrade(3));
-					event.getInventory().setItem(7, getUpgrade(4));
-					event.getInventory().setItem(19, getUpgrade(5));
-					player.updateInventory();
-				}
-			}
-			/*
-			*	Explosives Item
-			*/
-			else if(is.getType()==Material.FIREBALL && is.getItemMeta().hasLore()){
-				is = event.getInventory().getItem(13);
-				ItemMeta im = is.getItemMeta();
-				ArrayList<String> lore = new ArrayList<String>();
-				if(t.hasTokens(player, 8)){
-					t.removeTokens(player, 8);
-					if(!is.getItemMeta().hasLore()){
-						lore.add(ChatColor.RED + "Explosions I");
+				//player puts item in the slot
+				else if(is.getType()==Material.EMERALD && is.getItemMeta().hasLore() && event.getCursor()!=null){
+					is = event.getCursor();
+					if(!is.getType().toString().contains("PICKAXE")){
+						player.sendMessage(p.getPrefix() + ChatColor.RED + "The item has to be a pickaxe!");
 					}
 					else{
-						boolean hasench = false;
-						for(String str : im.getLore()){
-							if(str.equalsIgnoreCase(ChatColor.RED + "Explosions III")){
-								t.addTokens(player, 8);
-								player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to apply enchantment, enchantment level already at maximum level!");
-								lore.add(str);
-								hasench = true;
-							}
-							else if(str.contains(ChatColor.RED + "Explosions")){
-								str = str + "I";
-								lore.add(str);
-								hasench = true;
-							}
-							else{
-								lore.add(str);
-							}
-						}
-						if(hasench==false){
+						event.getInventory().setItem(13, is);
+						event.setCursor(new ItemStack(Material.AIR));
+						cursor.put(player.getName(), is);
+						event.getInventory().setItem(1, getUpgrade(1));
+						event.getInventory().setItem(3, getUpgrade(2));
+						event.getInventory().setItem(5, getUpgrade(3));
+						event.getInventory().setItem(7, getUpgrade(4));
+						event.getInventory().setItem(19, getUpgrade(5));
+						player.updateInventory();
+					}
+				}
+				/*
+				*	Explosives Item
+				*/
+				else if(is.getType()==Material.FIREBALL && is.getItemMeta().hasLore()){
+					is = event.getInventory().getItem(13);
+					ItemMeta im = is.getItemMeta();
+					ArrayList<String> lore = new ArrayList<String>();
+					if(t.hasTokens(player, 8)){
+						t.removeTokens(player, 8);
+						if(!is.getItemMeta().hasLore()){
 							lore.add(ChatColor.RED + "Explosions I");
 						}
-					}
-					im.setLore(lore);
-					is.setItemMeta(im);
-					lore.clear();
-					cursor.put(player.getName(), is);
-				}
-				else{
-					player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
-					player.closeInventory();
-				}
-			}
-			/*
-			*	NightVision Item
-			*/
-			else if(is.getType()==Material.EYE_OF_ENDER && is.getItemMeta().hasLore()){
-				is = event.getInventory().getItem(13);
-				ItemMeta im = is.getItemMeta();
-				ArrayList<String> lore = new ArrayList<String>();
-				if(t.hasTokens(player, 6)){
-					t.removeTokens(player, 6);
-					if(!is.getItemMeta().hasLore()){
-						lore.add(ChatColor.DARK_GREEN + "Night Vision I");
-					}
-					else{
-						boolean hasench = false;
-						for(String str : im.getLore()){
-							if(str.equalsIgnoreCase(ChatColor.DARK_GREEN + "Night Vision I")){
-								t.addTokens(player, 6);
-								player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to apply enchantment, enchantment level already at maximum level!");
-								lore.add(str);
-								hasench = true;
+						else{
+							boolean hasench = false;
+							for(String str : im.getLore()){
+								if(str.equalsIgnoreCase(ChatColor.RED + "Explosions III")){
+									t.addTokens(player, 8);
+									player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to apply enchantment, enchantment level already at maximum level!");
+									lore.add(str);
+									hasench = true;
+								}
+								else if(str.contains(ChatColor.RED + "Explosions")){
+									str = str + "I";
+									lore.add(str);
+									hasench = true;
+								}
+								else{
+									lore.add(str);
+								}
 							}
-							else{
-								lore.add(str);
+							if(hasench==false){
+								lore.add(ChatColor.RED + "Explosions I");
 							}
 						}
-						if(hasench == false){
+						im.setLore(lore);
+						is.setItemMeta(im);
+						lore.clear();
+						cursor.put(player.getName(), is);
+					}
+					else{
+						player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
+						player.closeInventory();
+					}
+				}
+				/*
+				*	NightVision Item
+				*/
+				else if(is.getType()==Material.EYE_OF_ENDER && is.getItemMeta().hasLore()){
+					is = event.getInventory().getItem(13);
+					ItemMeta im = is.getItemMeta();
+					ArrayList<String> lore = new ArrayList<String>();
+					if(t.hasTokens(player, 6)){
+						t.removeTokens(player, 6);
+						if(!is.getItemMeta().hasLore()){
 							lore.add(ChatColor.DARK_GREEN + "Night Vision I");
 						}
-					}
-					im.setLore(lore);
-					is.setItemMeta(im);
-					lore.clear();
-					cursor.put(player.getName(), is);
-				}
-				else{
-					player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
-					player.closeInventory();
-				}
-			}
-			/*
-			*	Speed Item
-			*/
-			else if(is.getType()==Material.SUGAR && is.getItemMeta().hasLore()){
-				is = event.getInventory().getItem(13);
-				ItemMeta im = is.getItemMeta();
-				ArrayList<String> lore = new ArrayList<String>();
-				if(t.hasTokens(player, 7)){
-					t.removeTokens(player, 7);
-					if(!is.getItemMeta().hasLore()){
-						lore.add(ChatColor.WHITE + "Speed I");
-					}
-					else{
-						boolean hasench = false;
-						for(String str : im.getLore()){
-							if(str.equalsIgnoreCase(ChatColor.WHITE + "Speed IV")){
-								t.addTokens(player, 7);
-								player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to apply enchantment, enchantment level already at maximum level!");
-								lore.add(str);
-								hasench = true;
+						else{
+							boolean hasench = false;
+							for(String str : im.getLore()){
+								if(str.equalsIgnoreCase(ChatColor.DARK_GREEN + "Night Vision I")){
+									t.addTokens(player, 6);
+									player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to apply enchantment, enchantment level already at maximum level!");
+									lore.add(str);
+									hasench = true;
+								}
+								else{
+									lore.add(str);
+								}
 							}
-							else if(str.equalsIgnoreCase(ChatColor.WHITE + "Speed III")){
-								str = ChatColor.WHITE + "Speed IV";
-								lore.add(str);
-								hasench = true;
-							}
-							else if(str.contains(ChatColor.WHITE + "Speed")){
-								str = str + "I";
-								lore.add(str);
-								hasench = true;
-							}
-							else{
-								lore.add(str);
+							if(hasench == false){
+								lore.add(ChatColor.DARK_GREEN + "Night Vision I");
 							}
 						}
-						if(hasench==false){
+						im.setLore(lore);
+						is.setItemMeta(im);
+						lore.clear();
+						cursor.put(player.getName(), is);
+					}
+					else{
+						player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
+						player.closeInventory();
+					}
+				}
+				/*
+				*	Speed Item
+				*/
+				else if(is.getType()==Material.SUGAR && is.getItemMeta().hasLore()){
+					is = event.getInventory().getItem(13);
+					ItemMeta im = is.getItemMeta();
+					ArrayList<String> lore = new ArrayList<String>();
+					if(t.hasTokens(player, 7)){
+						t.removeTokens(player, 7);
+						if(!is.getItemMeta().hasLore()){
 							lore.add(ChatColor.WHITE + "Speed I");
 						}
-					}
-					im.setLore(lore);
-					is.setItemMeta(im);
-					lore.clear();
-					cursor.put(player.getName(), is);
-				}
-				else{
-					player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
-					player.closeInventory();
-				}
-			}
-			/*
-			*	Efficiency Item
-			*/
-			else if(is.getType()==Material.REDSTONE && is.getItemMeta().hasLore()){
-				is = event.getInventory().getItem(13);
-				if(t.hasTokens(player, 5)){
-					t.removeTokens(player, 5);
-					if(is.containsEnchantment(Enchantment.DIG_SPEED)){
-						is.addUnsafeEnchantment(Enchantment.DIG_SPEED, is.getEnchantmentLevel(Enchantment.DIG_SPEED)+1);
-					}
-					else{
-						is.addEnchantment(Enchantment.DIG_SPEED, 1);
-					}
-					cursor.put(player.getName(), is);
-				}
-				else{
-					player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
-					player.closeInventory();
-				}
-			}
-			/*
-			*	Silk Touch Item
-			*/
-			else if(is.getType()==Material.QUARTZ && is.getItemMeta().hasLore()){
-				is = event.getInventory().getItem(13);
-				if(t.hasTokens(player, 8)){
-					t.removeTokens(player, 8);
-					if(is.containsEnchantment(Enchantment.SILK_TOUCH)){
-						t.addTokens(player, 8);
-						player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to apply enchantment, enchantment level already at maximum level!");
+						else{
+							boolean hasench = false;
+							for(String str : im.getLore()){
+								if(str.equalsIgnoreCase(ChatColor.WHITE + "Speed IV")){
+									t.addTokens(player, 7);
+									player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to apply enchantment, enchantment level already at maximum level!");
+									lore.add(str);
+									hasench = true;
+								}
+								else if(str.equalsIgnoreCase(ChatColor.WHITE + "Speed III")){
+									str = ChatColor.WHITE + "Speed IV";
+									lore.add(str);
+									hasench = true;
+								}
+								else if(str.contains(ChatColor.WHITE + "Speed")){
+									str = str + "I";
+									lore.add(str);
+									hasench = true;
+								}
+								else{
+									lore.add(str);
+								}
+							}
+							if(hasench==false){
+								lore.add(ChatColor.WHITE + "Speed I");
+							}
+						}
+						im.setLore(lore);
+						is.setItemMeta(im);
+						lore.clear();
+						cursor.put(player.getName(), is);
 					}
 					else{
-						is.addEnchantment(Enchantment.SILK_TOUCH, 1);
+						player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
+						player.closeInventory();
 					}
-					cursor.put(player.getName(), is);
 				}
-				else{
-					player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
-					player.closeInventory();
+				/*
+				*	Efficiency Item
+				*/
+				else if(is.getType()==Material.REDSTONE && is.getItemMeta().hasLore()){
+					is = event.getInventory().getItem(13);
+					if(t.hasTokens(player, 5)){
+						t.removeTokens(player, 5);
+						if(is.containsEnchantment(Enchantment.DIG_SPEED)){
+							is.addUnsafeEnchantment(Enchantment.DIG_SPEED, is.getEnchantmentLevel(Enchantment.DIG_SPEED)+1);
+						}
+						else{
+							is.addEnchantment(Enchantment.DIG_SPEED, 1);
+						}
+						cursor.put(player.getName(), is);
+					}
+					else{
+						player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
+						player.closeInventory();
+					}
+				}
+				/*
+				*	Silk Touch Item
+				*/
+				else if(is.getType()==Material.QUARTZ && is.getItemMeta().hasLore()){
+					is = event.getInventory().getItem(13);
+					if(t.hasTokens(player, 8)){
+						t.removeTokens(player, 8);
+						if(is.containsEnchantment(Enchantment.SILK_TOUCH)){
+							t.addTokens(player, 8);
+							player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to apply enchantment, enchantment level already at maximum level!");
+						}
+						else{
+							is.addEnchantment(Enchantment.SILK_TOUCH, 1);
+						}
+						cursor.put(player.getName(), is);
+					}
+					else{
+						player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
+						player.closeInventory();
+					}
 				}
 			}
 		}
@@ -303,7 +316,7 @@ public class UpgradeInv implements Listener{
 	@EventHandler
 	public void onExplodeBlock(BlockBreakEvent event){
 		Block block = event.getBlock();
-		if(p.isInRegion(block)){
+		if(p.isInAllowedRegion(block)){
 			Player player = event.getPlayer();
 			Random ran = new Random();
 			int r = ran.nextInt(100)+1;
@@ -457,7 +470,7 @@ public class UpgradeInv implements Listener{
 			is = new ItemStack(Material.ANVIL, 1);
 			im = is.getItemMeta();
 			im.setDisplayName(ChatColor.WHITE + "" + ChatColor.BOLD + "Repair Tool");
-			lore.add(ChatColor.AQUA + "Repair an item to max durability");
+			lore.add(ChatColor.AQUA + "Repairs the item in your hand to max durability for 21 crystals");
 			im.setLore(lore);
 			lore.clear();
 			is.setItemMeta(im);

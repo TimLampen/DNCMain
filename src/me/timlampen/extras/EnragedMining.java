@@ -39,12 +39,19 @@ public class EnragedMining implements Listener{
 	public void onInteract(PlayerInteractEvent event){
 		final Player player = event.getPlayer();
 		if(player.getItemInHand().getType()!=null && player.getItemInHand().getType().toString().contains("PICKAXE") && (event.getAction()==Action.RIGHT_CLICK_AIR || event.getAction()==Action.RIGHT_CLICK_BLOCK)){
+			
+			if(ready.containsKey(player.getUniqueId()) && ready.get(player.getUniqueId())==2){
+				player.sendMessage(p.getPrefix() + ChatColor.RED + "There is a five minute cooldown inbetween 'Enraged Mining' boosts!");
+			}
 			if(!ready.containsKey(player.getUniqueId())){
 				ready.put(player.getUniqueId(), 1);
 				player.sendMessage(p.getPrefix() + ChatColor.GRAY + "*You Raise Your Pickaxe*");
 				Bukkit.getScheduler().runTaskLater(p, new Runnable(){
 					@Override
 					public void run() {
+						if(ready.containsKey(player.getUniqueId()) && ready.get(player.getUniqueId())==2){
+							return;
+						}
 						player.sendMessage(p.getPrefix() + ChatColor.GRAY + "*You Lower Your Pickaxe*");
 						ready.remove(player.getUniqueId());
 					}
@@ -54,14 +61,14 @@ public class EnragedMining implements Listener{
 			else if(ready.containsKey(player.getUniqueId()) && ready.get(player.getUniqueId())==1){
 				ready.put(player.getUniqueId(), 2);
 				player.sendMessage(p.getPrefix() + ChatColor.YELLOW + "" + ChatColor.MAGIC + "G" + ChatColor.YELLOW + "" + ChatColor.BOLD + "ENRAGED MINING ACTIVATED!!!" + ChatColor.YELLOW + "" + ChatColor.MAGIC + "G");
-				player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,  20*5, p.getConfig().getInt("Enraged", 10)-1));
+				player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,  20*5, p.getConfig().getInt("Enraged", 5)-1));
 				runnable(player);
 				Bukkit.getScheduler().runTaskLater(p, new Runnable(){
 	
 					@Override
 					public void run() {
 						ready.remove(player.getUniqueId());
-						player.sendMessage(p.getPrefix() + ChatColor.YELLOW + "Enraged Mining off of cooldown");
+						player.sendMessage(p.getPrefix() + ChatColor.YELLOW + "Enraged Mining is now off of cooldown");
 					}}, 20*300);
 			}
 		}
