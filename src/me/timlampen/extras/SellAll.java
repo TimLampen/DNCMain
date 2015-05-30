@@ -46,11 +46,13 @@ public class SellAll{
 				player.updateInventory();
 			}
 		}
+		player.sendMessage(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "----------" + ChatColor.RESET);
+		player.sendMessage(ChatColor.RED + "You've Sold:");
 		for(Entry<Material, Integer> map : mat.entrySet()){
-			player.sendMessage(p.getPrefix() + ChatColor.GREEN + "You sold " + ChatColor.AQUA + map.getValue() + " " + map.getKey().toString().replace("_", " ") + ChatColor.GREEN + " for" + ChatColor.AQUA + "" + ChatColor.BOLD + " $" + getMoney(rank, map.getKey(), map.getValue()) + "!");
+			player.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + map.getValue() + ChatColor.GRAY + "] " + map.getKey().toString());
 		}
+		double multi = 1;
 		mat.clear();
-		player.sendMessage(p.getPrefix() + ChatColor.GREEN + "You sold all your blocks for a total of" + ChatColor.AQUA + " $" + ChatColor.BOLD + getMoney(value) + "!");
 		for(double i = 1.0; i<=5.0; i=i+.1){
 			if(player.hasPermission("multiplier." + i)){
 				if(i<=bl.getMultiplier(player)){
@@ -58,15 +60,18 @@ public class SellAll{
 				}
 				else{
 					p.eco.depositPlayer(player, value*i);
-					player.sendMessage(p.getPrefix() + ChatColor.YELLOW + "Multiplier Detected! You have sold your blocks for " + ChatColor.GOLD + "x" + i + ChatColor.YELLOW + " the money!");
+					multi = i;
 					break;
 				}
 			}
 		}
 		if(bl.getMultiplier(player)>1){
 			p.eco.depositPlayer(player, value*bl.getMultiplier(player));
-			player.sendMessage(p.getPrefix() + ChatColor.YELLOW + "Multiplier Detected! You have sold your blocks for " + ChatColor.GOLD + "x" + bl.getMultiplier(player) + ChatColor.YELLOW + " the money! A total of " + ChatColor.GOLD + "" + ChatColor.BOLD + "$" + getMoney(value*bl.getMultiplier(player)));
+			multi = bl.getMultiplier(player);
 		}
+		player.sendMessage(ChatColor.RED + "You've made: " + getMoney(value*multi));
+		player.sendMessage(ChatColor.DARK_GRAY + "Your total has been multiplied by " + ChatColor.RED + "" + ChatColor.UNDERLINE + multi);
+		player.sendMessage(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "----------" + ChatColor.RESET);
 	}
 	
 	public Double getItemPrice(String rank, Material type){

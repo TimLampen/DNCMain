@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -50,6 +51,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -59,7 +62,7 @@ public class Main extends JavaPlugin{
 	private Prestige pre;
 	private NameInfo ni;
 	private UpgradeInv ui;
-	private SellAll sa;
+	public SellAll sa;
 	private BackPack bp;
 	private RankDis rd;
 	private CommandHandler ch;
@@ -90,8 +93,10 @@ public class Main extends JavaPlugin{
     //public EffectManager em;
 	public Map<UUID, PackPlayer> playerInfos;
     private static Plugin plugin;
+    public Table<UUID, Material, Integer> asellitems = HashBasedTable.create();
     ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
 	public ArrayList<UUID> message = new ArrayList<UUID>();
+	public HashMap<UUID, Double> aselltotal = new HashMap<UUID, Double>();
     public static Plugin getPlugin(){
     	return plugin;
     }
@@ -108,6 +113,7 @@ public class Main extends JavaPlugin{
     	
     	return ChatColor.translateAlternateColorCodes('&', getConfig().getString("Prefix", ChatColor.BOLD + "["+ChatColor.RED+ChatColor.BOLD+"D"+ChatColor.GRAY+ChatColor.BOLD+"C"+ChatColor.WHITE+ChatColor.BOLD+"]"+ChatColor.RESET + " "));
     }
+	public ArrayList<UUID> asell = new ArrayList<UUID>();
 	@Override
 	public void onEnable(){
 		console.sendMessage(getPrefix() + "Starting Load...");
@@ -134,6 +140,7 @@ public class Main extends JavaPlugin{
 		l = new Lang(this);
 		pa = new Parse(l);
 		sc = new ScratchCards(this, pa);
+		bl = new BlockListener(this);
 		sa = new SellAll(this, pa, bl);
 		r = new Rankup(l);
 		si = new ScratchInv(sc, this, l);
@@ -150,9 +157,9 @@ public class Main extends JavaPlugin{
 		wi = new WarpInv(this, l, r);
 		g = new Goodies(this, l, gl, rl);
 		sbl = new ScoreBoardListener(this, bl, r);
-		ui = new UpgradeInv(this,  t);
+		ui = new UpgradeInv(this, t);
 		ch = new CommandHandler(gl, dp, bl, rl, this, l, sbl, mb, g, t, sc, rd, bp, sa, ui, pre);
-		bl = new BlockListener(this, ch, sa);
+		vl = new SBVoteListener(this, dp);
 		Bukkit.getPluginManager().registerEvents(bl, this);
 		Bukkit.getPluginManager().registerEvents(sbl, this);
 		Bukkit.getPluginManager().registerEvents(rl, this);
@@ -169,6 +176,7 @@ public class Main extends JavaPlugin{
 		Bukkit.getPluginManager().registerEvents(bp, this);
 		Bukkit.getPluginManager().registerEvents(ui, this);
 		Bukkit.getPluginManager().registerEvents(ni, this);
+		Bukkit.getPluginManager().registerEvents(vl, this);
 		getCommand("prestige").setExecutor(ch);
 		getCommand("crystalinv").setExecutor(ch);
 		getCommand("sall").setExecutor(ch);
@@ -219,6 +227,42 @@ public class Main extends JavaPlugin{
 		ni.loadItems();
 		pre.loadPresitge();
 		addPermissions();
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
+
+			@Override
+			public void run(){
+				for(Entry<UUID, Map<Material, Integer>> entry : asellitems.rowMap().entrySet()){
+					UUID uuid = entry.getKey();
+					if(Bukkit.getPlayer(uuid)!=null){
+						Player player = Bukkit.getPlayer(uuid);
+						player.sendMessage(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "----------" + ChatColor.RESET);
+						player.sendMessage(ChatColor.RED + "You've Sold:");
+						for(Material mate : entry.getValue().keySet()){
+							int amt = entry.getValue().get(mate);
+							player.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + amt + ChatColor.GRAY + "] " + mate.toString());
+						}
+						double multi = 1;
+						for(double i = 1.0; i<=5.0; i=i+.1){
+							if(player.hasPermission("multiplier." + i)){
+								if(i<=bl.getMultiplier(player)){
+									break;
+								}
+								else{
+									multi = i;
+									break;
+								}
+							}
+						}
+						if(bl.getMultiplier(player)>1){
+							multi = bl.getMultiplier(player);
+						}
+						player.sendMessage(ChatColor.RED + "You've made: " + getMoney(aselltotal.get(player.getUniqueId())*multi));
+						player.sendMessage(ChatColor.DARK_GRAY + "Your total has been multiplied by " + ChatColor.RED + "" + ChatColor.UNDERLINE + multi);
+						player.sendMessage(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "----------" + ChatColor.RESET);
+					}
+				}
+				
+			}}, 0, 400);
 		console.sendMessage(getPrefix() + "Success! Plugin Startup Complete!");
 	}
 	

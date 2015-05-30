@@ -99,9 +99,11 @@ public class UpgradeInv implements Listener{
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onUpgradeClick(InventoryClickEvent event){
-		if(event.getWhoClicked() instanceof Player && event.getInventory()!=null && event.getInventory().getName()!=null && event.getInventory()!=null && event.getInventory().getName().equalsIgnoreCase("upgrade inventory")){
+		if(event.getWhoClicked() instanceof Player && event.getView().getTopInventory()!=null && event.getView().getTopInventory().getName()!=null && event.getView().getTopInventory()!=null && event.getView().getTopInventory().getName().equalsIgnoreCase("upgrade inventory")){
+			Inventory inv = event.getView().getTopInventory();
+			Inventory bot = event.getView().getBottomInventory();
 			Player player = (Player)event.getWhoClicked();
-			if(event.getCurrentItem()!=null && !(event.getClickedInventory().getType()==InventoryType.PLAYER)){
+			if(event.getCurrentItem()!=null && event.getClickedInventory().equals(inv)){
 				event.setCancelled(true);
 				//back button
 				ItemStack is = event.getCurrentItem();
@@ -115,14 +117,14 @@ public class UpgradeInv implements Listener{
 						player.sendMessage(p.getPrefix() + ChatColor.RED + "The item has to be a pickaxe!");
 					}
 					else{
-						event.getInventory().setItem(13, is);
+						inv.setItem(13, is);
 						event.setCursor(new ItemStack(Material.AIR));
 						cursor.put(player.getName(), is);
-						event.getInventory().setItem(1, getUpgrade(1));
-						event.getInventory().setItem(3, getUpgrade(2));
-						event.getInventory().setItem(5, getUpgrade(3));
-						event.getInventory().setItem(7, getUpgrade(4));
-						event.getInventory().setItem(19, getUpgrade(5));
+						inv.setItem(1, getUpgrade(1));
+						inv.setItem(3, getUpgrade(2));
+						inv.setItem(5, getUpgrade(3));
+						inv.setItem(7, getUpgrade(4));
+						inv.setItem(19, getUpgrade(5));
 						player.updateInventory();
 					}
 				}
@@ -130,7 +132,7 @@ public class UpgradeInv implements Listener{
 				*	Explosives Item
 				*/
 				else if(is.getType()==Material.FIREBALL && is.getItemMeta().hasLore()){
-					is = event.getInventory().getItem(13);
+					is = inv.getItem(13);
 					ItemMeta im = is.getItemMeta();
 					ArrayList<String> lore = new ArrayList<String>();
 					if(t.hasTokens(player, 8)){
@@ -174,7 +176,7 @@ public class UpgradeInv implements Listener{
 				*	NightVision Item
 				*/
 				else if(is.getType()==Material.EYE_OF_ENDER && is.getItemMeta().hasLore()){
-					is = event.getInventory().getItem(13);
+					is = inv.getItem(13);
 					ItemMeta im = is.getItemMeta();
 					ArrayList<String> lore = new ArrayList<String>();
 					if(t.hasTokens(player, 6)){
@@ -213,7 +215,7 @@ public class UpgradeInv implements Listener{
 				*	Speed Item
 				*/
 				else if(is.getType()==Material.SUGAR && is.getItemMeta().hasLore()){
-					is = event.getInventory().getItem(13);
+					is = inv.getItem(13);
 					ItemMeta im = is.getItemMeta();
 					ArrayList<String> lore = new ArrayList<String>();
 					if(t.hasTokens(player, 7)){
@@ -262,7 +264,7 @@ public class UpgradeInv implements Listener{
 				*	Efficiency Item
 				*/
 				else if(is.getType()==Material.REDSTONE && is.getItemMeta().hasLore()){
-					is = event.getInventory().getItem(13);
+					is = inv.getItem(13);
 					if(t.hasTokens(player, 5)){
 						t.removeTokens(player, 5);
 						if(is.containsEnchantment(Enchantment.DIG_SPEED)){
@@ -282,7 +284,7 @@ public class UpgradeInv implements Listener{
 				*	Silk Touch Item
 				*/
 				else if(is.getType()==Material.QUARTZ && is.getItemMeta().hasLore()){
-					is = event.getInventory().getItem(13);
+					is = inv.getItem(13);
 					if(t.hasTokens(player, 8)){
 						t.removeTokens(player, 8);
 						if(is.containsEnchantment(Enchantment.SILK_TOUCH)){
@@ -298,6 +300,12 @@ public class UpgradeInv implements Listener{
 						player.sendMessage(p.getPrefix() + ChatColor.RED + "Unable to purchase upgrade, not enough crystals!");
 						player.closeInventory();
 					}
+				}
+			}
+			else if(event.getClickedInventory()!=null && bot!=null && event.getClickedInventory().equals(bot)){
+				if(event.isShiftClick()){
+					player.sendMessage(p.getPrefix() + ChatColor.RED + "Error: Shiftclicking is not avaliable at this time");
+					event.setCancelled(true);
 				}
 			}
 		}

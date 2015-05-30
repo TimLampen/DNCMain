@@ -70,14 +70,10 @@ public class NameInfo implements Listener{
 			TextComponent arrow = new TextComponent(" » ");
 			arrow.setColor(ChatColor.DARK_GRAY);
 			arrow.setBold(false);
-			TextComponent msg = new TextComponent(event.getMessage());
-			msg.setColor(ChatColor.GRAY);
-			msg.setBold(false);
 			mar.addExtra(prestige);
 			mar.addExtra(rank);
 			mar.addExtra(name);
 			mar.addExtra(arrow);
-			mar.addExtra(msg);
 			
 			Date d = new Date(player.getFirstPlayed());
 			ComponentBuilder cb = new ComponentBuilder("-=[").color(ChatColor.GRAY).append("♦").color(ChatColor.GOLD).append("]=- -=[").color(ChatColor.GRAY).append(player.getName()).color(ChatColor.YELLOW).append("]=- -=[").color(ChatColor.GRAY).append("♦").color(ChatColor.GOLD).append("]=-").color(ChatColor.GRAY)
@@ -89,7 +85,10 @@ public class NameInfo implements Listener{
 					.append("\n").append("Next rank: ").color(ChatColor.DARK_AQUA).append("[").color(ChatColor.DARK_GRAY).append(r.getNextRank(p.perms.getPrimaryGroup(player))).color(ChatColor.BLUE).append("]").color(ChatColor.DARK_GRAY)
 					.append("\n").append("Crystals: ").color(ChatColor.DARK_BLUE).append(t.getTokens(player) + " crystals").color(ChatColor.WHITE)
 					.append("\n").append("Blocks broken: ").color(ChatColor.DARK_PURPLE).append(getBlocks(player) + " blocks").color(ChatColor.RESET);
-			
+			TextComponent msg = new TextComponent(event.getMessage());
+			msg.setColor(ChatColor.GRAY);
+			msg.setBold(false);
+			mar.addExtra(msg);
 			mar.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, cb.create()));
 			for(Player plyer : Bukkit.getOnlinePlayers()){
 				plyer.spigot().sendMessage(mar);

@@ -166,9 +166,7 @@ public class GrenadeListener implements Listener{
 	                }
 	            while(blocks.hasNext()){
 	                Block block = blocks.next();
-	                player.sendMessage("1");
 	                if(p.isInAllowedRegion(block)){
-	                	player.sendMessage("allowed");
 	                	if(!tempblks.contains(block)){
 		                	tempblks.add(block);
 		                    Iterator<ItemStack> stack = block.getDrops().iterator();

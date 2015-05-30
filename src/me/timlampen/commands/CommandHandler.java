@@ -1,6 +1,7 @@
 package me.timlampen.commands;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 import me.timlampen.currency.BackPack;
@@ -25,6 +26,7 @@ import me.timlampen.util.Main;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -68,7 +70,6 @@ public class CommandHandler implements CommandExecutor{
 		this.ui =ui;
 		this.pre = pre;
 	}
-	public ArrayList<UUID> asell = new ArrayList<UUID>();
 	@SuppressWarnings({ "deprecation", "static-access", "unused" })
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -698,12 +699,18 @@ public class CommandHandler implements CommandExecutor{
 				}
 			}
 			else if(cmd.getName().equalsIgnoreCase("autosell")){
-					if(asell.contains(player.getUniqueId())){
-						asell.remove(player.getUniqueId());
+					if(p.asell.contains(player.getUniqueId())){
+						p.asell.remove(player.getUniqueId());
+						if(p.asellitems.containsRow(player.getUniqueId())){
+							p.asellitems.row(player.getUniqueId()).clear();
+						}
+						if(p.aselltotal.containsKey(player.getUniqueId())){
+							p.aselltotal.remove(player.getUniqueId());
+						}
 						player.sendMessage(p.getPrefix() + ChatColor.RED + "You have turned off autosell");
 					}
 					else{
-						asell.add(player.getUniqueId());
+						p.asell.add(player.getUniqueId());
 						player.sendMessage(p.getPrefix() + ChatColor.GREEN + "You have turned on autosell");
 					}
 				}

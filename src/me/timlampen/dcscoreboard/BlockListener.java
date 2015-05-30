@@ -22,15 +22,16 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+
 public class BlockListener implements Listener{
   private Random rnd = new Random();
 	Main p;
-	CommandHandler ch;
 	SellAll sa;
-	public BlockListener(Main p, CommandHandler ch, SellAll sa){
+	public BlockListener(Main p){
 		this.p = p;
-		this.ch = ch;
-		this.sa = sa;
+		this.sa = p.sa;
 	}
 	HashMap<UUID, Double> multi = new HashMap<UUID, Double>();
 	@EventHandler
@@ -71,7 +72,19 @@ public class BlockListener implements Listener{
     	  int ran = rnd.nextInt(max-min)+min;
     	  is.setAmount(ran);
       }
-      if(ch.asell.contains(player.getUniqueId())){
+      if(p.asell.contains(player.getUniqueId())){
+    	  if(p.asellitems.contains(player.getUniqueId(), is.getType())){
+    		  p.asellitems.put(player.getUniqueId(), is.getType(), p.asellitems.get(player.getUniqueId(), is.getType())+is.getAmount());
+    	  }
+    	  else{
+    		  p.asellitems.put(player.getUniqueId(), is.getType(), is.getAmount());
+    	  }
+    	  if(p.aselltotal.containsKey(player.getUniqueId())){
+    		  p.aselltotal.put(player.getUniqueId(), p.aselltotal.get(player.getUniqueId()) + sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), is.getType())*is.getAmount());
+    	  }
+    	  else{
+    		  p.aselltotal.put(player.getUniqueId(), sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), is.getType())*is.getAmount());
+    	  }
 			p.eco.depositPlayer(player, sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), is.getType())*is.getAmount());
       }
       else{
