@@ -134,7 +134,7 @@ public class MineBow implements Listener{
 							while(stack.hasNext()){
 								ItemStack items = stack.next();
 								if(items != null && player!=null) {
-								   player.getInventory().addItem(items);
+	                        		player.getInventory().addItem(p.translateBlock(items));
 								   stack.remove();
 								}
 							}

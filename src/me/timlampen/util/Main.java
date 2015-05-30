@@ -47,6 +47,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -157,7 +158,7 @@ public class Main extends JavaPlugin{
 		wi = new WarpInv(this, l, r);
 		g = new Goodies(this, l, gl, rl);
 		sbl = new ScoreBoardListener(this, bl, r);
-		ui = new UpgradeInv(this, t);
+		ui = new UpgradeInv(this, t, e);
 		ch = new CommandHandler(gl, dp, bl, rl, this, l, sbl, mb, g, t, sc, rd, bp, sa, ui, pre);
 		vl = new SBVoteListener(this, dp);
 		Bukkit.getPluginManager().registerEvents(bl, this);
@@ -416,5 +417,30 @@ public class Main extends JavaPlugin{
 	  public static List<String> getPermissions()
 	  {
 	    return permissions;
+	  }
+	  
+	  public ItemStack translateBlock(ItemStack is){
+		  if(is!=null){
+			  if(is.getType().toString().contains("_ORE")){
+				  if(is.getType()==Material.DIAMOND_ORE){
+					  is.setType(Material.DIAMOND);
+				  }
+				  else if(is.getType()==Material.EMERALD_ORE){
+					  is.setType(Material.EMERALD);
+				  }
+				  else if(is.getType()==Material.REDSTONE_ORE){
+					  is.setType(Material.REDSTONE);
+				  }
+				  else if(is.getType()==Material.COBBLESTONE){
+					  is.setType(Material.STONE);
+				  }
+				  else{
+					  String[] split = is.getType().toString().split("_");
+				  	  is.setType(Material.getMaterial(split[0]+"_INGOT"));
+				  }
+				  return is;
+			  }
+		  }
+		  return is;
 	  }
 }

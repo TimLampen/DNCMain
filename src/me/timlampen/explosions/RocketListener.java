@@ -175,7 +175,7 @@ public class RocketListener implements Listener{
 		                        		blocks.remove();
 		                        	}
 		                        	else{
-		                        		player.getInventory().addItem(items);
+		                        		player.getInventory().addItem(p.translateBlock(items));
 		                        		stack.remove();
 		                        	}
 		                        }

@@ -80,12 +80,12 @@ public class BlockListener implements Listener{
     		  p.asellitems.put(player.getUniqueId(), is.getType(), is.getAmount());
     	  }
     	  if(p.aselltotal.containsKey(player.getUniqueId())){
-    		  p.aselltotal.put(player.getUniqueId(), p.aselltotal.get(player.getUniqueId()) + sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), is.getType())*is.getAmount());
+    		  p.aselltotal.put(player.getUniqueId(), p.aselltotal.get(player.getUniqueId()) + p.sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), is.getType())*is.getAmount());
     	  }
     	  else{
-    		  p.aselltotal.put(player.getUniqueId(), sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), is.getType())*is.getAmount());
+    		  p.aselltotal.put(player.getUniqueId(), p.sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), is.getType())*is.getAmount());
     	  }
-			p.eco.depositPlayer(player, sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), is.getType())*is.getAmount());
+			p.eco.depositPlayer(player, p.sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), is.getType())*is.getAmount());
       }
       else{
     	  player.getInventory().addItem(new ItemStack[] { is });

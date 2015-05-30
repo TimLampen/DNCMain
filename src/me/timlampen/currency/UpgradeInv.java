@@ -2,9 +2,11 @@ package me.timlampen.currency;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import me.timlampen.util.Explosions;
 import me.timlampen.util.Main;
 
 import org.bukkit.Bukkit;
@@ -12,10 +14,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -28,10 +32,11 @@ import org.bukkit.potion.PotionEffectType;
 public class UpgradeInv implements Listener{
 	Main p;
 	Tokens t;
-	
-	public UpgradeInv(Main p, Tokens t){
+	Explosions e;
+	public UpgradeInv(Main p, Tokens t, Explosions e){
 		this.p = p;
 		this.t = t;
+		this.e = e;
 	}
 	//Main Iventory
 	public void openMainInv(Player player){
@@ -338,7 +343,7 @@ public class UpgradeInv implements Listener{
 						}
 					}
 					if(r<=chance){
-						player.getWorld().createExplosion(block.getLocation(), 4f);
+						e.explode(player.getLocation(), player, 12, false, true);
 					}
 			}
 		}
@@ -540,4 +545,52 @@ public class UpgradeInv implements Listener{
 			}
 		}
 	}
+	private ArrayList<Block> tempblks = new ArrayList<>();
+	    @EventHandler
+	    public void onExplode(EntityExplodeEvent event){
+	        Iterator<Block> blocks = event.blockList().iterator();
+	        if(event.getEntity() instanceof Player){
+	        	Player player = (Player)event.getEntity();
+	        	LivingEntity item = (LivingEntity)event.getEntity();
+	            while(blocks.hasNext()){
+	                Block block = blocks.next();
+	                if(p.isInAllowedRegion(block)){
+	                	if(!tempblks.contains(block)){
+		                	tempblks.add(block);
+		                    Iterator<ItemStack> stack = block.getDrops().iterator();
+		                    while(stack.hasNext()){
+		                        ItemStack items = stack.next();
+		                        if(items != null) {
+		                        	if(items.getItemMeta().equals(Material.BEDROCK)){
+		                        		stack.remove();
+		                        		item.remove();
+		                        		blocks.remove();
+		                        	}
+		                        	else{
+		                        		if(p.asell.contains(player.getUniqueId())){
+		                        			p.eco.depositPlayer(player, p.sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), p.translateBlock(items).getType())*items.getAmount());
+		                        		}
+		                        		else{
+		                        			player.getInventory().addItem(p.translateBlock(items));
+		                        		}
+		                        		stack.remove();
+		                        	}
+		                        }
+		                    }
+		                }
+	                }
+	                else{
+	                    blocks.remove();
+	                }
+	        }
+	     }
+	        
+	        Bukkit.getScheduler().runTaskLater(p, new Runnable(){
+
+				@Override
+				public void run() {
+					tempblks.clear();
+					
+				}}, 40);
+	    }
 }
