@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import me.timlampen.commands.CommandHandler;
 import me.timlampen.extras.SellAll;
+import me.timlampen.util.ConfigMaker;
 import me.timlampen.util.Main;
 
 import org.bukkit.Material;
@@ -199,6 +200,23 @@ public class BlockListener implements Listener{
 			multi.put(player.getUniqueId(), value);
 		}
 	}
-  
+	ConfigMaker config;
+	public void saveMulti(){
+		config = new ConfigMaker(p, "multi.yml");
+		for(UUID uuid: multi.keySet()){
+			double val = multi.get(uuid);
+			config.set(uuid.toString(), val);
+		}
+		config.save();
+	}
+	
+	public void loadMulti(){
+		config = new ConfigMaker(p, "multi.yml");
+		for(String s : config.getConfigurationSection("").getKeys(false)){
+			UUID uuid = UUID.fromString(s);
+			double val = config.getDouble(s);
+			multi.put(uuid, val);
+		}
+	}
   
 }

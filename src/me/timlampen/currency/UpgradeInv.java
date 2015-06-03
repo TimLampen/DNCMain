@@ -343,7 +343,7 @@ public class UpgradeInv implements Listener{
 						}
 					}
 					if(r<=chance){
-						e.explode(player.getLocation(), player, 12, false, true);
+						e.explode(player.getLocation(), player, 4, false, true);
 					}
 			}
 		}
@@ -561,19 +561,31 @@ public class UpgradeInv implements Listener{
 		                    while(stack.hasNext()){
 		                        ItemStack items = stack.next();
 		                        if(items != null) {
-		                        	if(items.getItemMeta().equals(Material.BEDROCK)){
+		                        	if(items.getType()==Material.BEDROCK || items.getType()==Material.GLOWSTONE){
 		                        		stack.remove();
 		                        		item.remove();
 		                        		blocks.remove();
 		                        	}
 		                        	else{
 		                        		if(p.asell.contains(player.getUniqueId())){
+		                        			  if(p.asellitems.contains(player.getUniqueId(), p.translateBlock(items).getType())){
+		                        	    		  p.asellitems.put(player.getUniqueId(), p.translateBlock(items).getType(), p.asellitems.get(player.getUniqueId(), p.translateBlock(items).getType())+p.translateBlock(items).getAmount());
+		                        	    	  }
+		                        	    	  else{
+		                        	    		  p.asellitems.put(player.getUniqueId(), p.translateBlock(items).getType(), p.translateBlock(items).getAmount());
+		                        	    	  }
+		                        	    	  if(p.aselltotal.containsKey(player.getUniqueId())){
+		                        	    		  p.aselltotal.put(player.getUniqueId(), p.aselltotal.get(player.getUniqueId()) + p.sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), p.translateBlock(items).getType())*p.translateBlock(items).getAmount());
+		                        	    	  }
+		                        	    	  else{
+		                        	    		  p.aselltotal.put(player.getUniqueId(), p.sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), p.translateBlock(items).getType())*p.translateBlock(items).getAmount());
+		                        	    	  }
 		                        			p.eco.depositPlayer(player, p.sa.getItemPrice(p.perms.getPrimaryGroup(player).toString(), p.translateBlock(items).getType())*items.getAmount());
 		                        		}
 		                        		else{
 		                        			player.getInventory().addItem(p.translateBlock(items));
 		                        		}
-		                        		stack.remove();
+		                        		blocks.next().setType(Material.AIR);
 		                        	}
 		                        }
 		                    }
@@ -583,6 +595,7 @@ public class UpgradeInv implements Listener{
 	                    blocks.remove();
 	                }
 	        }
+	            event.setYield(0);
 	     }
 	        
 	        Bukkit.getScheduler().runTaskLater(p, new Runnable(){

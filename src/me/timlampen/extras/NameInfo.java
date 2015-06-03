@@ -51,7 +51,7 @@ public class NameInfo implements Listener{
 		MPlayer mplayer = m.getMPlayer(player);
 		String married = mplayer.isMarried() ? "<3 " : "";
 		if(event.getMessage().contains("http:") || event.getMessage().contains("www.") || event.getMessage().contains(".com") || event.getMessage().contains(".net") || event.getMessage().contains(".ca") || event.getMessage().contains(".org")){
-			String s = ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + married + ChatColor.GRAY + "" + ChatColor.BOLD + pre.getNumber(pre.getPrestige(player)) + "" + getPrefix(player) + " " + player.getDisplayName() + ChatColor.DARK_GRAY + " » " + ChatColor.GRAY + event.getMessage();
+			String s = ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + married + ChatColor.GRAY + "" + pre.getNumber(pre.getPrestige(player)) + "" + getPrefix(player) + " " + player.getDisplayName() + ChatColor.DARK_GRAY + " » " + ChatColor.GRAY + event.getMessage();
 			for(Player plyer : Bukkit.getOnlinePlayers()){
 				plyer.sendMessage(s);
 			}
@@ -63,7 +63,6 @@ public class NameInfo implements Listener{
 			mar.setBold(true);
 			TextComponent prestige = new TextComponent(pre.getNumber(pre.getPrestige(player)));
 			prestige.setColor(ChatColor.GRAY);
-			prestige.setBold(true);
 			TextComponent rank = new TextComponent(getPrefix(player) + " ");
 			
 			TextComponent name = new TextComponent(player.getDisplayName());

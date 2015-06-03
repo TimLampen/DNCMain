@@ -1,7 +1,12 @@
 package me.timlampen.util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -10,8 +15,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import me.timlampen.chatreaction.ChatReactionListener;
+import me.timlampen.chatreaction.IntervalTask;
+import me.timlampen.chatreaction.ReactionConfig;
+import me.timlampen.chatreaction.ReactionOptions;
+import me.timlampen.chatreaction.ReactionPlayer;
+import me.timlampen.chatreaction.WordFile;
 import me.timlampen.commands.CommandHandler;
 import me.timlampen.commands.Rankup;
 import me.timlampen.commands.RankupCommand;
@@ -51,6 +63,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -60,6 +73,38 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class Main extends JavaPlugin{
+	public ReactionConfig config = new ReactionConfig(this);
+	
+	public WordFile wordFile = new WordFile(this);
+
+	private ReactionOptions options;
+
+	final String CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+	private Random ran;
+
+	private static boolean isRunning;
+	
+	private static boolean scrambled;
+
+	private static String currentWord = null;
+	
+	private static String displayWord = null;
+	
+	private static long startTime;
+	
+	private static BukkitTask iTask = null;
+	
+	private static BukkitTask endTask = null;
+	
+	
+	public static Map<String, ReactionPlayer> reactionPlayers = new HashMap<String, ReactionPlayer>();
+
+	public static List<ReactionPlayer> topPlayers = new ArrayList<ReactionPlayer>();
+	
+	
+	
+	
 	private Prestige pre;
 	private NameInfo ni;
 	private UpgradeInv ui;
@@ -178,6 +223,7 @@ public class Main extends JavaPlugin{
 		Bukkit.getPluginManager().registerEvents(ui, this);
 		Bukkit.getPluginManager().registerEvents(ni, this);
 		Bukkit.getPluginManager().registerEvents(vl, this);
+		Bukkit.getPluginManager().registerEvents(new ChatReactionListener(this), this);
 		getCommand("prestige").setExecutor(ch);
 		getCommand("crystalinv").setExecutor(ch);
 		getCommand("sall").setExecutor(ch);
@@ -224,6 +270,7 @@ public class Main extends JavaPlugin{
 		for(String s: getConfig().getStringList("Goodie.Commands")){
 			g.cmd.add(s);
 		}
+		bl.loadMulti();
 		bp.loadItems();
 		ni.loadItems();
 		pre.loadPresitge();
@@ -264,6 +311,14 @@ public class Main extends JavaPlugin{
 				}
 				
 			}}, 0, 400);
+		ran = new Random();
+
+		config.loadCfg();
+
+		options = new ReactionOptions(this);
+
+		start();
+		
 		console.sendMessage(getPrefix() + "Success! Plugin Startup Complete!");
 	}
 	
@@ -289,6 +344,14 @@ public class Main extends JavaPlugin{
 		for(UUID s : pre.rank.keySet()){
 			pre.savePrestige(s);
 		}
+		bl.saveMulti();
+		stop();
+		Bukkit.getScheduler().cancelTasks(this);
+		options = null;
+		setCurrentWord(null);
+		setDisplayWord(null);
+		reactionPlayers = null;
+		topPlayers = null;
 		log.info("Config saving complete!");
 	}
 	
@@ -431,16 +494,272 @@ public class Main extends JavaPlugin{
 				  else if(is.getType()==Material.REDSTONE_ORE){
 					  is.setType(Material.REDSTONE);
 				  }
-				  else if(is.getType()==Material.COBBLESTONE){
-					  is.setType(Material.STONE);
-				  }
 				  else{
 					  String[] split = is.getType().toString().split("_");
 				  	  is.setType(Material.getMaterial(split[0]+"_INGOT"));
 				  }
 				  return is;
 			  }
+			  else if(is.getType()==Material.COBBLESTONE){
+				  is.setType(Material.STONE);
+			  }
+			  return is;
 		  }
 		  return is;
 	  }
+	  
+		
+
+		public void debug(Level lv, String msg) {
+			if (getOptions().debug()) {
+				System.out.println("[ReactionDebug "+lv.getName()+"] "+msg);
+			}
+		}
+		protected void reload() {
+			stop();
+			Bukkit.getScheduler().cancelTasks(this);
+			reloadConfig();
+			saveConfig();
+			options = new ReactionOptions(this);
+			start();
+		}
+		
+		protected void start() {
+			if (endTask != null) {
+				debug(Level.INFO, "Cancelling previous reaction end task");
+				endTask.cancel();
+				endTask = null;
+			}
+
+			
+			if (iTask == null) {
+				debug(Level.INFO, "Starting interval task!");
+				iTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this,
+						new IntervalTask(this), getOptions().interval() * 20,
+						getOptions().interval() * 20);
+			} else {
+				debug(Level.INFO, "Stopping old interval task!");
+				iTask.cancel();
+				iTask = null;
+				debug(Level.INFO, "Starting new interval task!");
+				iTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this,
+						new IntervalTask(this), getOptions().interval() * 20,
+						getOptions().interval() * 20);	
+			}
+		}
+		
+		protected void stop() {
+			if (endTask != null) {
+				debug(Level.INFO, "Stopping reaction end task!");
+				endTask.cancel();
+				endTask = null;
+			}
+			if (iTask != null) {
+				debug(Level.INFO, "Stopping reaction interval task!");
+				iTask.cancel();
+				iTask = null;
+			}
+		}
+		
+		public String scramble(String input) {
+			
+			if (!getOptions().scrambleSpaces() || !input.contains(" ")) {
+				
+				List<Character> characters = new ArrayList<Character>();
+
+				for (char c : input.toCharArray()) {
+					characters.add(c);
+				}
+
+				StringBuilder output = new StringBuilder(input.length());
+				
+				while (characters.size() != 0) {
+					
+					int rndm = (int) (Math.random() * characters.size());
+					
+					output.append(characters.remove(rndm));
+				}
+				
+				return output.toString();
+			
+			} else {
+				
+				String out = "";
+				
+				for (String part : input.split(" ")) {
+					
+					List<Character> characters = new ArrayList<Character>();
+
+					for (char c : part.toCharArray()) {
+						characters.add(c);
+					}
+
+					StringBuilder output = new StringBuilder(part.length());
+					
+					while (characters.size() != 0) {
+						
+						int rndm = (int) (Math.random() * characters.size());
+						
+						output.append(characters.remove(rndm));
+					}
+					out = out+output.toString()+" ";
+				}
+				
+				return out.trim();
+			}
+		}
+
+		public String pickWord() {
+			
+			String s = "";
+			
+			if (getOptions().useCustomWords() && getOptions().customWords() != null && !getOptions().customWords().isEmpty()) {
+				
+				s = getOptions().customWords().get(ran.nextInt(getOptions().customWords().size()));
+				
+			} else {
+				
+				for (int i = 0; i < getOptions().charLength(); i++) {
+					
+					s = s + CHARS.charAt(ran.nextInt(CHARS.length()));
+				}		
+			}
+			return s;
+		}
+
+		public ReactionOptions getOptions() {
+			
+			if (options == null) {
+				options = new ReactionOptions(this);
+			}
+			return options;
+		}
+
+		public void giveRewards(String playerName) {
+
+			List<String> rewards = getOptions().rewards();
+
+			if (rewards == null || rewards.isEmpty()) {
+				return;
+			}
+
+			List<String> give = new ArrayList<String>();
+
+			for (int i = 0; i < getOptions().rewardAmt(); i++) {
+				String g = rewards.get(ran.nextInt(rewards.size()));
+
+				if (give.contains(g)) {
+					g = rewards.get(ran.nextInt(rewards.size()));
+					
+					if (give.contains(g)) {
+						continue;
+					}
+				}
+				give.add(g);
+			}
+
+			if (give.isEmpty()) {
+				return;
+			}
+			
+			for (String command : give) {
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("@p", playerName));
+			}
+		}
+		
+		public static int getOnline() {
+	        try {
+	            Method method = Bukkit.class.getMethod("getOnlinePlayers");
+	            Object players = method.invoke(null);
+
+	            if(players instanceof Player[]) {
+	                Player[] playerArray = (Player[]) players;
+	                return playerArray.length;
+	            }
+	            else {
+	            	@SuppressWarnings("unchecked")
+					Collection<Player> pl = (Collection<Player>) players;
+	                return pl.size();
+	            }
+	        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+	            e.printStackTrace();
+	        }
+	        return 0;
+	    }
+		
+		public String getTime(long time) {
+			
+			if (startTime <= 0) {
+				return "0";
+			}
+			
+			double s = (time-startTime)/1000.00;
+			
+			return String.format("%.2f", new Object[] { s });
+		}
+		
+		public static boolean hasData(String uuid) {
+			
+			if (reactionPlayers == null || reactionPlayers.isEmpty()) {
+				return false;
+			}
+			
+			return reactionPlayers.keySet().contains(uuid) && reactionPlayers.get(uuid) != null;
+		}
+
+		public static boolean isRunning() {
+			return isRunning;
+		}
+
+		public static void setRunning(boolean isRunning) {
+			Main.isRunning = isRunning;
+		}
+
+		public static String getCurrentWord() {
+			return currentWord;
+		}
+
+		public static void setCurrentWord(String currentWord) {
+			Main.currentWord = currentWord;
+		}
+
+		public static String getDisplayWord() {
+			return displayWord;
+		}
+
+		public static void setDisplayWord(String displayWord) {
+			Main.displayWord = displayWord;
+		}
+		
+		public static long getStartTime() {
+			return startTime;
+		}
+		
+		public static void setStartTime(long time) {
+			Main.startTime = time;
+		}
+		
+		public static BukkitTask getIntervalTask() {
+			return iTask;
+		}
+		
+		public static void setIntervalTask(BukkitTask task) {
+			Main.iTask = task;
+		}
+		
+		public static BukkitTask getEndTask() {
+			return endTask;
+		}
+		
+		public static void setEndTask(BukkitTask task) {
+			Main.endTask = task;
+		}
+		
+		public static boolean isScrambled() {
+			return scrambled;
+		}
+		
+		public static void setScrambled(boolean scramble) {
+			Main.scrambled = scramble;
+		}
 }

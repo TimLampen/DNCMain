@@ -34,6 +34,7 @@ public class Prestige {
 				player.sendMessage(p.getPrefix() + ChatColor.GRAY + "Clearing Money...");
 				p.eco.withdrawPlayer(player.getName(), p.eco.getBalance(player.getName()));
 				player.sendMessage(p.getPrefix() + ChatColor.GRAY + "Clearing BackPack...");
+				player.getInventory().setArmorContents(null);
 				player.getInventory().clear();
 				player.sendMessage(p.getPrefix() + ChatColor.GRAY + "Clearing Inventory...");
 				player.chat("/spawn");
@@ -51,6 +52,7 @@ public class Prestige {
 				player.sendMessage(p.getPrefix() + ChatColor.GRAY + "Clearing Money...");
 				p.eco.withdrawPlayer(player.getName(), p.eco.getBalance(player.getName()));
 				player.sendMessage(p.getPrefix() + ChatColor.GRAY + "Clearing BackPack...");
+				player.getInventory().setArmorContents(null);
 				player.getInventory().clear();
 				player.sendMessage(p.getPrefix() + ChatColor.GRAY + "Clearing Inventory...");
 				player.chat("/spawn");

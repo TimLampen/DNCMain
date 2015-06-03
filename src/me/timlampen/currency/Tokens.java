@@ -52,7 +52,7 @@ public class Tokens implements Listener{
 				Random ran = new Random();
 				int r = ran.nextInt(3)+1;
 				addTokens(player, r);
-				player.sendMessage(p.getPrefix() + ChatColor.DARK_GRAY + "You just recieved " + r +" crystal(s) for mining 1000 blocks!");
+				player.sendMessage(p.getPrefix() + ChatColor.DARK_GRAY + "You just recieved " + r +" crystal(s) for mining 10000 blocks!");
 				blocks.remove(player.getUniqueId());
 			}
 			else{
